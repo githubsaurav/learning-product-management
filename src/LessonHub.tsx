@@ -1,4 +1,4 @@
-import { BookOpen, Search } from "lucide-react";
+import { BookOpen, Search, Compass } from "lucide-react";
 
 function hasProgress(key: string, isStarted: (parsed: unknown) => boolean): boolean {
   try {
@@ -10,9 +10,21 @@ function hasProgress(key: string, isStarted: (parsed: unknown) => boolean): bool
   }
 }
 
-export default function LessonHub({ onOpenDay1, onOpenStory }: { onOpenDay1: () => void; onOpenStory: () => void }) {
+export default function LessonHub({
+  onOpenDay1,
+  onOpenStory,
+  onOpenConcepts,
+}: {
+  onOpenDay1: () => void;
+  onOpenStory: () => void;
+  onOpenConcepts: () => void;
+}) {
   const day1Started = hasProgress("daily-product-intuition:day1", (p) => (p as { screen?: string })?.screen !== "welcome");
   const storyStarted = hasProgress("vanishing-cart:progress", (p) => (p as { scene?: number })?.scene !== 1);
+  const conceptsStarted = hasProgress("concepts-lab:progress", (p) => {
+    const state = p as { notebook?: unknown[]; artifacts?: Record<string, unknown> };
+    return (state.notebook?.length ?? 0) > 0 || Object.keys(state.artifacts ?? {}).length > 0;
+  });
 
   return (
     <main className="mx-auto max-w-xl px-4 py-10 sm:py-14">
@@ -38,6 +50,14 @@ export default function LessonHub({ onOpenDay1, onOpenStory }: { onOpenDay1: () 
           detail="Investigate why customers abandon their cart · about 8–10 minutes"
           cta={storyStarted ? "Continue" : "Start"}
           onClick={onOpenStory}
+        />
+        <LessonCard
+          icon={Compass}
+          eyebrow="Concepts Learning · 5-module studio"
+          title="User Journey Thinking Lab"
+          detail="Investigate, build, and defend a user journey · about 4–6 hours"
+          cta={conceptsStarted ? "Continue" : "Start"}
+          onClick={onOpenConcepts}
         />
       </div>
     </main>

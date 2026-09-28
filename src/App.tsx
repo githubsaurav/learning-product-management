@@ -3,15 +3,16 @@ import { ArrowLeft } from "lucide-react";
 import LessonHub from "@/LessonHub";
 import Day1Lesson from "@/Day1Lesson";
 import VanishingCartLesson from "@/VanishingCartLesson";
+import ConceptsLab from "@/ConceptsLab";
 
-type ActiveLesson = "home" | "day1" | "vanishing-cart";
+type ActiveLesson = "home" | "day1" | "vanishing-cart" | "concepts";
 
 const ACTIVE_LESSON_KEY = "daily-product-intuition:active-lesson";
 
 function loadActiveLesson(): ActiveLesson {
   try {
     const raw = window.localStorage.getItem(ACTIVE_LESSON_KEY);
-    if (raw === "day1" || raw === "vanishing-cart" || raw === "home") return raw;
+    if (raw === "day1" || raw === "vanishing-cart" || raw === "concepts" || raw === "home") return raw;
     return "home";
   } catch {
     return "home";
@@ -44,10 +45,11 @@ export default function App() {
       )}
 
       {activeLesson === "home" && (
-        <LessonHub onOpenDay1={() => setActiveLesson("day1")} onOpenStory={() => setActiveLesson("vanishing-cart")} />
+        <LessonHub onOpenDay1={() => setActiveLesson("day1")} onOpenStory={() => setActiveLesson("vanishing-cart")} onOpenConcepts={() => setActiveLesson("concepts")} />
       )}
       {activeLesson === "day1" && <Day1Lesson />}
       {activeLesson === "vanishing-cart" && <VanishingCartLesson onExit={() => setActiveLesson("home")} />}
+      {activeLesson === "concepts" && <ConceptsLab />}
     </>
   );
 }
