@@ -2,19 +2,18 @@ import { useState } from "react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
-import { NoteComposer } from "@/lab/components/NoteComposer";
 import { OrderableList } from "@/lab/components/OrderableList";
-import { ArtifactCard } from "@/lab/components/ArtifactCard";
+import { BoundaryInserter } from "@/lab/components/BoundaryInserter";
+import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { ExpertOverlay } from "@/lab/components/ExpertOverlay";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { journeyMapArtifact, journeyStageTemplate } from "@/lab/data/artifacts";
 import { module3Reading } from "@/lab/data/readingRoom";
-import { airbnbIntro, fragments, stageModel, funnelWhyNot, layerTeachings, referenceMap, futureStateGoal, futureInterventions, mapVisualRules } from "@/lab/data/module3";
+import { airbnbIntro, fragments, stageModel, funnelWhyNot, layerTeachings, referenceMap, sortableLayers, futureStateGoal, futureStateChoices, futureInterventions, mapVisualRules } from "@/lab/data/module3";
 
-const TOTAL = 9;
-const CASE_LABEL = "Module 3 · Nisha & Kabir's Airbnb weekend";
+const TOTAL = 8;
 const CONTROL_TAGS = ["Controls", "Influences", "Acknowledges only"];
 
 export function Module3({ lab }: { lab: LabProgressApi }) {
@@ -24,14 +23,13 @@ export function Module3({ lab }: { lab: LabProgressApi }) {
       <ModuleHeader eyebrow="Module 3 · Build the Map" question="How do we turn messy reality into a useful model?" section={section} totalSections={TOTAL} trace="A" />
 
       {section === 1 && <SceneFragments lab={lab} />}
-      {section === 2 && <SceneSpine lab={lab} />}
-      {section === 3 && <SceneStages lab={lab} />}
-      {section === 4 && <SceneLayers />}
-      {section === 5 && <SceneDraftStages lab={lab} />}
-      {section === 6 && <SceneReferenceMap lab={lab} />}
-      {section === 7 && <SceneFutureState lab={lab} />}
-      {section === 8 && <SceneVisualRules />}
-      {section === 9 && <SceneArtifact lab={lab} />}
+      {section === 2 && <SceneSpineAndStages lab={lab} />}
+      {section === 3 && <SceneLayers />}
+      {section === 4 && <SceneMapBuilder lab={lab} />}
+      {section === 5 && <SceneReferenceMap lab={lab} />}
+      {section === 6 && <SceneFutureState lab={lab} />}
+      {section === 7 && <SceneVisualRules />}
+      {section === 8 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -70,9 +68,10 @@ function SceneFragments({ lab }: { lab: LabProgressApi }) {
   );
 }
 
-function SceneSpine({ lab }: { lab: LabProgressApi }) {
+function SceneSpineAndStages({ lab }: { lab: LabProgressApi }) {
   const order = lab.state.multi["m3-spine"]?.length ? lab.state.multi["m3-spine"] : fragments.map((f) => f.id);
   const items = order.map((id) => fragments.find((f) => f.id === id)!).filter(Boolean);
+  const boundaries = (lab.state.multi["m3-boundaries"] ?? []).map(Number);
 
   function move(id: string, dir: -1 | 1) {
     const idx = order.indexOf(id);
@@ -83,41 +82,30 @@ function SceneSpine({ lab }: { lab: LabProgressApi }) {
     lab.setMulti("m3-spine", next);
   }
 
+  function toggleBoundary(index: number) {
+    const set = new Set(boundaries);
+    if (set.has(index)) set.delete(index);
+    else set.add(index);
+    lab.setMulti("m3-boundaries", [...set].map(String));
+  }
+
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Find the spine</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">
-        The spine is the minimum sequence of user actions and decisions required to tell the journey coherently. Arrange the fragments chronologically — use the arrows to reorder.
-      </p>
+      <h2 className="text-sm font-bold text-[var(--color-ink)]">Find the spine, then mark the stages</h2>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Reorder the fragments chronologically with the arrows, then tap between two fragments to mark where a stage boundary goes — where the person's subgoal changes.</p>
       <div className="mt-3">
         <OrderableList items={items} onMove={move} />
       </div>
-      <div className="mt-3">
-        <NoteComposer prompt="Note anything uncertain about the order (e.g. items that probably repeated, or aren't strictly linear)" withLabel={false} onSave={(text) => lab.addNote("m3", CASE_LABEL, "note", text)} />
+      <div className="mt-4 rounded-xl bg-black/[0.03] p-3">
+        <LabLabel>Insert stage boundaries</LabLabel>
+        <BoundaryInserter items={items} boundariesAfter={boundaries} onToggle={toggleBoundary} />
       </div>
-    </LabCard>
-  );
-}
-
-function SceneStages({ lab }: { lab: LabProgressApi }) {
-  const guess = lab.state.freeText["m3-stage-guess"] ?? "";
-  return (
-    <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Name stages by user progress</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Before seeing a model, where would you draw boundaries — where does the person's subgoal change?</p>
-      <textarea
-        value={guess}
-        onChange={(e) => lab.setFreeText("m3-stage-guess", e.target.value)}
-        rows={3}
-        placeholder="Describe where you'd split the journey into stages…"
-        className="mt-2 w-full resize-none rounded-lg border border-[var(--color-border)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-      />
-      {guess && (
+      {boundaries.length > 0 && (
         <div className="mt-4 animate-fade-in-up space-y-2">
-          <LabLabel>A possible model</LabLabel>
+          <LabLabel>A possible model (six stages)</LabLabel>
           <ol className="space-y-1.5">
             {stageModel.map((s, i) => (
-              <li key={s.name} className="rounded-lg bg-black/[0.03] p-2.5 text-sm">
+              <li key={s.name} className="rounded-lg bg-[var(--color-accent-2-soft)] p-2.5 text-sm">
                 <span className="font-bold text-[var(--color-ink)]">
                   {i + 1}. {s.name}
                 </span>
@@ -155,25 +143,42 @@ function SceneLayers() {
   );
 }
 
-function SceneDraftStages({ lab }: { lab: LabProgressApi }) {
-  const [count, setCount] = useState(3);
+function SceneMapBuilder({ lab }: { lab: LabProgressApi }) {
+  const [layerIndex, setLayerIndex] = useState(0);
+  const layer = sortableLayers[layerIndex];
+  const items = layer.items.map((it, i) => ({ id: `${layer.key}-${i}`, text: it.text, correctColumn: it.correctStage }));
+  const assignments: Record<string, number | undefined> = {};
+  for (const it of items) {
+    const v = lab.state.selections[`m3-map-${layer.key}-${it.id}`];
+    if (v !== undefined) assignments[it.id] = Number(v);
+  }
+
   return (
-    <div className="space-y-3">
-      <LabCard>
-        <h2 className="text-sm font-bold text-[var(--color-ink)]">Draft your own stages</h2>
-        <p className="mt-1 text-xs text-[var(--color-slate)]">Fill in what you can for a few stages. Partial is fine — this becomes part of your map artifact.</p>
-      </LabCard>
-      {Array.from({ length: count }).map((_, i) => {
-        const artifactId = `m3-stage-${i}`;
-        const values = lab.state.artifacts[artifactId] ?? {};
-        return <ArtifactCard key={artifactId} def={{ ...journeyStageTemplate, id: artifactId, title: `${journeyStageTemplate.title} ${i + 1}` }} values={values} onChange={(k, v) => lab.setArtifactField(artifactId, k, v)} />;
-      })}
-      {count < 6 && (
-        <button type="button" onClick={() => setCount((c) => c + 1)} className="w-full rounded-xl border border-dashed border-[var(--color-border)] py-2.5 text-xs font-bold text-[var(--color-slate)]">
-          + Add another stage
-        </button>
-      )}
-    </div>
+    <LabCard>
+      <h2 className="text-sm font-bold text-[var(--color-ink)]">Build the map: place each snippet in its stage</h2>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Pick a layer, then sort its statements into the six stage columns.</p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {sortableLayers.map((l, i) => (
+          <button
+            key={l.key}
+            type="button"
+            onClick={() => setLayerIndex(i)}
+            className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${i === layerIndex ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-slate)]"}`}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
+      <div className="mt-3">
+        <EvidenceBoard
+          columns={stageModel.map((s) => s.name)}
+          items={items}
+          assignments={assignments}
+          checkable
+          onAssign={(id, col) => lab.setSelection(`m3-map-${layer.key}-${id}`, String(col))}
+        />
+      </div>
+    </LabCard>
   );
 }
 
@@ -182,7 +187,7 @@ function SceneReferenceMap({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">The full example map</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Compare your draft with a fuller reference — once you've built your own.</p>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Compare your sorted layers with a fuller reference, including layers you didn't sort.</p>
       <div className="mt-3">
         <ExpertOverlay revealed={revealed} onReveal={() => lab.revealOverlay("m3-reference-map")}>
           <div className="overflow-x-auto">
@@ -219,14 +224,22 @@ function SceneReferenceMap({ lab }: { lab: LabProgressApi }) {
 
 function SceneFutureState({ lab }: { lab: LabProgressApi }) {
   const tags = lab.state.selections;
+  const pick = lab.state.selections["m3-future-pick"] ?? null;
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Future-state studio</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Redesign only the transition: booking → preparing to arrive.</p>
-      <div className="mt-2 rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-xs text-[var(--color-ink)]">{futureStateGoal}</div>
-      <div className="mt-3">
-        <NoteComposer prompt="State the desired future in your own experiential terms first" withLabel={false} onSave={(text) => lab.addNote("m3", CASE_LABEL, "note", `Future state: ${text}`)} />
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Redesign only the transition: booking → preparing to arrive. First, pick the stronger way to state the desired future.</p>
+      <div className="mt-2">
+        <ChoiceReveal
+          options={[
+            { id: "weak", text: futureStateChoices.weak, note: futureStateChoices.note },
+            { id: "strong", text: futureStateChoices.strong, note: futureStateChoices.note, strongest: true },
+          ]}
+          selected={pick}
+          onSelect={(id) => lab.setSelection("m3-future-pick", id)}
+        />
       </div>
+      {pick && <div className="mt-2 rounded-xl bg-black/[0.03] p-2.5 text-xs text-[var(--color-ink)]">{futureStateGoal}</div>}
       <LabLabel>Possible interventions — mark what Airbnb controls, influences, or must merely acknowledge</LabLabel>
       <div className="space-y-2">
         {futureInterventions.map((intervention) => {
@@ -271,11 +284,25 @@ function SceneVisualRules() {
   );
 }
 
-function SceneArtifact({ lab }: { lab: LabProgressApi }) {
-  const values = lab.state.artifacts[journeyMapArtifact.id] ?? {};
+function SceneRecap({ lab }: { lab: LabProgressApi }) {
+  let correct = 0;
+  let total = 0;
+  for (const layer of sortableLayers) {
+    for (let i = 0; i < layer.items.length; i++) {
+      total++;
+      const v = lab.state.selections[`m3-map-${layer.key}-${layer.key}-${i}`];
+      if (v !== undefined && Number(v) === layer.items[i].correctStage) correct++;
+    }
+  }
   return (
     <div className="space-y-4">
-      <ArtifactCard def={journeyMapArtifact} values={values} onChange={(k, v) => lab.setArtifactField(journeyMapArtifact.id, k, v)} />
+      <LabCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Current-State Journey Map</p>
+        <p className="mt-2 text-sm text-[var(--color-ink)]">
+          You placed {correct} of {total} snippets in their matching stage across the layers you sorted.
+        </p>
+        <p className="mt-2 text-xs text-[var(--color-slate)]">This map — your stage boundaries, your sorted layers, and your future-state pick — is the model you built by interacting with the evidence, not by writing about it.</p>
+      </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>
         <div className="mt-2">

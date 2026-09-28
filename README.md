@@ -66,31 +66,37 @@ npm run dev
 
 ## Concepts Learning: the User Journey Thinking Lab
 
-A much larger studio, deliberately not a quiz — no scores anywhere, ever.
-Six areas, always reachable from the top pill nav: **Studio Home** (course
-map, no completion percentages — just not-started / in-progress / draft
-saved), **Module 1–5**, **Case Notebook**, **Concept Shelf** (searchable
-glossary), **Reading Room**, and **Practice Studio** (5 rehearsal modes) —
-plus a **Portfolio Capstone** that exports everything as Markdown.
+A much larger studio, deliberately not a quiz — no scores, and **no typing
+anywhere**. The learner never fills in a text box; every exercise is a
+click, a pick, a sort, or a reorder over content already written for the
+case, with the underlying model built for them as a result. Nine areas,
+reachable from the top pill nav: **Studio Home** (course map — not
+started / in progress / model built, never a percentage), **Module 1–5**,
+**Concept Shelf** (searchable glossary), **Reading Room**, and **Practice
+Studio** (5 rehearsal modes) — plus a **Portfolio Capstone** that exports
+everything you built as Markdown.
 
 - **One TRACE framework throughout** (Target → Reconstruct → Arrange →
   Concentrate → Evaluate), shown as a small rail on every module screen,
   highlighting the current letter rather than re-teaching it each time.
-- **Evidence labels** (Observed / Reported / Inferred / Assumed) are
-  attachable to any saved note, with calm color coding — never red/green
-  correctness.
-- **A hint ladder** (Prompt → Lens → Example) and an **expert overlay**
-  ("this is one defensible interpretation, not the answer key") are used
-  instead of grading — both opt-in, both revealed by the learner.
-- Interactions favor accessible primitives over drag-and-drop: a
-  timeline **boundary is a range slider** (Meera's journey start, Rahul's
-  success boundary, the camera-zoom lens comparison), **evidence pinning
-  is tap-to-assign** (select a statement, then tap the column it belongs
-  in), and **reordering is up/down arrows** (Module 3's 12-fragment spine).
-- **Every module ends in a saved artifact** (Journey Frame Card, Evidence
-  Board, Current-State Journey Map, Opportunity Brief, Interview
-  Storyboard) using the exact field templates from the brief, autosaved to
-  the case notebook as you type.
+- **A framing sentence is a mad-lib, not a text box** — tap a blank, pick
+  from 2–3 pre-written options, and watch a line explain what that choice
+  changed (Module 1).
+- **A journey map is assembled by sorting**, not typed into a form: pick a
+  layer (Actions, Emotion, Needs, Friction), then tap-assign shuffled
+  statements into the six stage columns; check your placement, then
+  compare against the full reference map (Module 3).
+- **A root-cause ladder is a click-through reveal** — "What made that
+  consequential?" reveals one rung at a time instead of asking the learner
+  to invent the chain (Module 4).
+- **Reordering** (the causal chain in Module 5, priority ranking in
+  Module 4, the 12-fragment Airbnb spine in Module 3) is up/down arrows,
+  with a "check" that compares your order to the intended one.
+- **An expert overlay** ("this is one defensible interpretation, not the
+  answer key") is opt-in and revealed by the learner, never shown upfront.
+- Every module's closing screen is a **recap assembled from what you
+  clicked** — the framing sentence you built, the stage you placed each
+  snippet in, the direction you picked — not a form you filled in.
 
 ## Code structure
 
@@ -100,9 +106,9 @@ src/
   LessonHub.tsx         the three-lesson picker screen
   Day1Lesson.tsx        Day 1 quiz entry point
   VanishingCartLesson.tsx   story entry point (clues bar + case file + scene switch)
-  ConceptsLab.tsx        Concepts Learning entry point (area nav + notebook drawer)
-  StudioHome.tsx, CaseNotebookScreen.tsx, ConceptShelfScreen.tsx,
-  ReadingRoomScreen.tsx, PracticeStudio.tsx, PortfolioCapstone.tsx   the lab's six other areas
+  ConceptsLab.tsx        Concepts Learning entry point (area nav)
+  StudioHome.tsx, ConceptShelfScreen.tsx, ReadingRoomScreen.tsx,
+  PracticeStudio.tsx, PortfolioCapstone.tsx   the lab's other areas
 
   data/, state/, components/, screens/     Day 1 quiz — content, localStorage hook, shared UI, screens
 
@@ -113,17 +119,17 @@ src/
     components/, scenes/         Scene1..Scene8, StoryCompletion
 
   lab/
-    types.ts              NotebookEntry, EvidenceLabel, ArtifactDef, etc.
-    state/useLabProgress.ts    the one localStorage-backed store for the whole lab (notebook, artifacts, and generic freeText/selections/multi/timeline/hints/overlays buckets keyed per-interaction)
+    state/useLabProgress.ts    one localStorage-backed store: generic selections/multi/timeline/hints/overlays/flags buckets, each keyed per-interaction — no free-text field
     state/useModuleSection.ts  tracks which section of a module is showing, persisted
-    components/            TraceRail, NotebookDrawer, HintLadder, ExpertOverlay,
-                            EvidenceLabelPicker, TimelineSlider, EvidenceBoard,
-                            OrderableList, ArtifactCard, RatingRow, ReadingList
-    data/                   module1.ts..module5.ts (case content), artifacts.ts
-                            (the section-10 templates), glossary.ts, readingRoom.ts,
-                            moduleMeta.ts, practiceStudio.ts
+    components/            TraceRail, MadLibSentence, ChoiceReveal, RevealSteps,
+                            SelectChips, BoundaryInserter, OrderableList,
+                            EvidenceBoard (tap-to-assign, with an optional
+                            "check my placement" reveal), TimelineSlider, ExpertOverlay
+    data/                   module1.ts..module5.ts (case content + every option/
+                            distractor the choice-based exercises use),
+                            glossary.ts, readingRoom.ts, moduleMeta.ts, practiceStudio.ts
     modules/                Module1.tsx..Module5.tsx — each a sequence of sections
-                            sharing the components above
+                            built entirely from the components above
 ```
 
 ## Accessibility (all three lessons)
@@ -137,8 +143,6 @@ src/
 - Every draggable-feeling interaction has a non-drag form: sliders
   (native keyboard support), tap-to-assign, and arrow-button reordering —
   never a raw drag-and-drop requirement.
-- Modals (case notebook, expert overlay) close on Escape as well as by
-  clicking outside or the close button.
 - Respects `prefers-reduced-motion`.
 - Answer options stay visible after feedback appears, so learners can
   compare all four side by side.

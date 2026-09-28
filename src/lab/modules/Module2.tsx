@@ -3,13 +3,12 @@ import { ChevronDown } from "lucide-react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
-import { NoteComposer } from "@/lab/components/NoteComposer";
+import { SelectChips } from "@/lab/components/SelectChips";
 import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
-import { ArtifactCard } from "@/lab/components/ArtifactCard";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { evidenceBoardArtifact } from "@/lab/data/artifacts";
 import { module2Reading } from "@/lab/data/readingRoom";
 import {
   arjunIntro,
@@ -19,16 +18,15 @@ import {
   boardItems,
   behaviorLayers,
   interviewMoves,
-  questionDimensions,
-  leadingExample,
+  followUpQuestions,
   researchWindows,
-  otherStories,
+  synthesisPairs,
   synthesisRules,
   researchPlanQuestions,
+  firstExplanationOptions,
 } from "@/lab/data/module2";
 
 const TOTAL = 10;
-const CASE_LABEL = "Module 2 · Arjun's abandoned cart";
 
 export function Module2({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m2");
@@ -46,7 +44,7 @@ export function Module2({ lab }: { lab: LabProgressApi }) {
       {section === 7 && <SceneWindows />}
       {section === 8 && <SceneSynthesis lab={lab} />}
       {section === 9 && <SceneResearchPlan lab={lab} />}
-      {section === 10 && <SceneArtifact lab={lab} />}
+      {section === 10 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -61,6 +59,7 @@ export function Module2({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneFirstExplanation({ lab }: { lab: LabProgressApi }) {
+  const chosen = lab.state.selections["m2-first-explanation"] ?? "";
   return (
     <LabCard>
       <p className="text-sm text-[var(--color-ink)]">{arjunIntro}</p>
@@ -71,9 +70,10 @@ function SceneFirstExplanation({ lab }: { lab: LabProgressApi }) {
         ))}
       </ul>
       <div className="mt-4">
-        <NoteComposer prompt="Arjun did not order because ____________." withLabel={false} onSave={(text) => lab.addNote("m2", CASE_LABEL, "assumption", `First explanation: ${text}`)} />
+        <LabLabel>Pick the explanation that feels most likely to you right now</LabLabel>
+        <SelectChips options={firstExplanationOptions} selected={chosen ? [chosen] : []} onToggle={(o) => lab.setSelection("m2-first-explanation", o)} />
       </div>
-      <p className="mt-2 text-xs italic text-[var(--color-slate)]">Write any hypothesis. It won't be evaluated — you'll compare it with evidence next.</p>
+      <p className="mt-3 text-xs italic text-[var(--color-slate)]">This is just your starting instinct — not evaluated. You'll compare it with real evidence next.</p>
     </LabCard>
   );
 }
@@ -134,17 +134,18 @@ function SceneBoard({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Evidence board</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Pin each statement into the column where it belongs.</p>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Pin each statement into the column where it belongs, then check your placement.</p>
       <div className="mt-3">
         <EvidenceBoard
           columns={boardColumns}
           items={boardItems}
           assignments={assignments}
+          checkable
           onAssign={(id, col) => lab.setSelection(`m2-board-${id}`, String(col))}
           hint={(id, col) => {
             const item = boardItems.find((b) => b.id === id);
             if (item && item.correctColumn === 2 && col === 0) {
-              return "Did we witness this, hear it described, or infer it from behavior? Consider moving it to “what we think it might mean.”";
+              return "Did we witness this, hear it described, or infer it from behavior? Consider “what we think it might mean.”";
             }
             if (item && item.correctColumn === 1 && col === 0) {
               return "This is something Arjun said, not something we directly witnessed — consider “what the person said.”";
@@ -205,7 +206,7 @@ function SceneInterviewMoves() {
             {m.avoid && (
               <p className="mt-1 text-xs text-[var(--color-ink)]">
                 <span className="font-bold text-[var(--color-danger)]">Avoid: </span>
-                {m.avoid.startsWith("“") || m.avoid.includes("Were") ? `“${m.avoid}”` : m.avoid}
+                {m.avoid}
               </p>
             )}
             {m.note && <p className="mt-1 text-xs text-[var(--color-slate)]">{m.note}</p>}
@@ -217,56 +218,35 @@ function SceneInterviewMoves() {
 }
 
 function SceneInterviewTable({ lab }: { lab: LabProgressApi }) {
-  const question = lab.state.freeText["m2-followup"] ?? "";
-  const dimension = lab.state.selections["m2-dimension"] ?? "";
+  const opened = lab.state.multi["m2-questions-opened"] ?? [];
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Write a follow-up question</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Pick a moment on Arjun's timeline and ask what you'd want to know next.</p>
-      <textarea
-        value={question}
-        onChange={(e) => lab.setFreeText("m2-followup", e.target.value)}
-        rows={2}
-        placeholder="Type your follow-up question…"
-        className="mt-2 w-full resize-none rounded-lg border border-[var(--color-border)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-      />
-      <LabLabel>Which dimension does this question explore?</LabLabel>
-      <div className="flex flex-wrap gap-1.5">
-        {questionDimensions.map((d) => (
-          <button
-            key={d}
-            type="button"
-            onClick={() => lab.setSelection("m2-dimension", d)}
-            className={`rounded-full border px-2.5 py-1 text-xs font-medium capitalize transition ${
-              dimension === d ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-ink)]"
-            }`}
-          >
-            {d}
-          </button>
-        ))}
+      <h2 className="text-sm font-bold text-[var(--color-ink)]">Spot the leading question</h2>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Tap each candidate follow-up question to see what dimension it explores, and whether it's leading or open.</p>
+      <div className="mt-3 space-y-2">
+        {followUpQuestions.map((q) => {
+          const open = opened.includes(q.id);
+          return (
+            <div key={q.id} className="rounded-xl border border-[var(--color-border)]">
+              <button type="button" onClick={() => lab.toggleMulti("m2-questions-opened", q.id)} className="flex w-full items-center justify-between p-3 text-left">
+                <span className="text-sm text-[var(--color-ink)]">&ldquo;{q.text}&rdquo;</span>
+                <ChevronDown size={14} className={`shrink-0 text-[var(--color-slate)] transition-transform ${open ? "rotate-180" : ""}`} />
+              </button>
+              {open && (
+                <div className="animate-fade-in-up space-y-1.5 border-t border-[var(--color-border)] p-3">
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[10px] font-bold capitalize text-[var(--color-accent-2)]">{q.dimension}</span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${q.leading ? "bg-[var(--color-danger-soft)] text-[var(--color-danger)]" : "bg-[var(--color-success-soft)] text-[var(--color-success)]"}`}>
+                      {q.leading ? "Leading" : "Open"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--color-ink)]">{q.note}</p>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
-
-      <div className="mt-4 rounded-xl bg-[var(--color-danger-soft)] p-3 text-xs">
-        <p className="font-bold text-[var(--color-ink)]">Is your question leading? Can Arjun disagree or surprise you with it?</p>
-        <p className="mt-1 text-[var(--color-ink)]">
-          <span className="font-bold text-[var(--color-danger)]">Leading: </span>
-          &ldquo;{leadingExample.leading}&rdquo;
-        </p>
-        <p className="mt-1 text-[var(--color-ink)]">
-          <span className="font-bold text-[var(--color-success)]">More open: </span>
-          &ldquo;{leadingExample.open}&rdquo;
-        </p>
-      </div>
-
-      {question && dimension && (
-        <button
-          type="button"
-          onClick={() => lab.addNote("m2", CASE_LABEL, "question", `[${dimension}] ${question}`)}
-          className="mt-3 w-full rounded-xl bg-[var(--color-ink)] py-2.5 text-xs font-bold text-white"
-        >
-          Save question to notebook
-        </button>
-      )}
     </LabCard>
   );
 }
@@ -298,13 +278,30 @@ function SceneSynthesis({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Synthesis without the mythical average user</h2>
-      <div className="mt-2 space-y-2">
-        {otherStories.map((s) => (
-          <div key={s.name} className="rounded-xl bg-black/[0.03] p-3">
-            <p className="text-sm font-bold text-[var(--color-ink)]">{s.name}</p>
-            <p className="text-xs text-[var(--color-slate)]">{s.story}</p>
-          </div>
-        ))}
+      <p className="mt-1 text-xs text-[var(--color-slate)]">For each story, decide: combine with Arjun's journey, or keep as a separate branch?</p>
+      <div className="mt-2 space-y-3">
+        {synthesisPairs.map((s) => {
+          const pick = lab.state.selections[`m2-synth-${s.name}`] ?? null;
+          return (
+            <div key={s.name} className="rounded-xl bg-black/[0.03] p-3">
+              <p className="text-sm font-bold text-[var(--color-ink)]">{s.name}</p>
+              <p className="text-xs text-[var(--color-slate)]">{s.story}</p>
+              <div className="mt-2 flex gap-1.5">
+                {(["Combine", "Keep separate"] as const).map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => lab.setSelection(`m2-synth-${s.name}`, label)}
+                    className={`rounded-full border px-2.5 py-1 text-xs font-bold transition ${pick === label ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-ink)]"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {pick && <p className="mt-1.5 animate-fade-in-up text-xs italic text-[var(--color-ink)]">{s.note}</p>}
+            </div>
+          );
+        })}
       </div>
       <LabLabel>Synthesis rules</LabLabel>
       <ul className="space-y-1 text-xs text-[var(--color-ink)]">
@@ -312,13 +309,6 @@ function SceneSynthesis({ lab }: { lab: LabProgressApi }) {
           <li key={r}>• {r}</li>
         ))}
       </ul>
-      <div className="mt-3">
-        <NoteComposer
-          prompt="Where would you combine Arjun, Sana, Dev, and Kavya's journeys, and where would you keep branches separate?"
-          withLabel={false}
-          onSave={(text) => lab.addNote("m2", CASE_LABEL, "note", text)}
-        />
-      </div>
     </LabCard>
   );
 }
@@ -328,20 +318,41 @@ function SceneResearchPlan({ lab }: { lab: LabProgressApi }) {
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Research-plan studio</h2>
       <p className="mt-1 text-xs text-[var(--color-slate)]">Budget: five interviews, one week of analytics support, access to support transcripts.</p>
-      <div className="mt-3 space-y-3">
-        {researchPlanQuestions.map((q) => (
-          <NoteComposer key={q} prompt={q} withLabel={false} onSave={(text) => lab.addNote("m2", CASE_LABEL, "note", `${q}: ${text}`)} />
+      <div className="mt-3 space-y-5">
+        {researchPlanQuestions.map((rq, i) => (
+          <div key={rq.question}>
+            <p className="text-sm font-bold text-[var(--color-ink)]">{rq.question}</p>
+            <div className="mt-2">
+              <ChoiceReveal options={rq.options} selected={lab.state.selections[`m2-plan-${i}`] ?? null} onSelect={(id) => lab.setSelection(`m2-plan-${i}`, id)} />
+            </div>
+          </div>
         ))}
       </div>
     </LabCard>
   );
 }
 
-function SceneArtifact({ lab }: { lab: LabProgressApi }) {
-  const values = lab.state.artifacts[evidenceBoardArtifact.id] ?? {};
+function SceneRecap({ lab }: { lab: LabProgressApi }) {
+  const first = lab.state.selections["m2-first-explanation"];
+  const combined = synthesisPairs.filter((s) => lab.state.selections[`m2-synth-${s.name}`] === "Combine").map((s) => s.name);
+  const separate = synthesisPairs.filter((s) => lab.state.selections[`m2-synth-${s.name}`] === "Keep separate").map((s) => s.name);
   return (
     <div className="space-y-4">
-      <ArtifactCard def={evidenceBoardArtifact} values={values} onChange={(k, v) => lab.setArtifactField(evidenceBoardArtifact.id, k, v)} />
+      <LabCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Evidence Board &amp; Research Plan</p>
+        {first && (
+          <p className="mt-2 text-sm text-[var(--color-ink)]">
+            Your first instinct was: <span className="italic">&ldquo;{first}&rdquo;</span> — compare that with what the six sources actually showed.
+          </p>
+        )}
+        {(combined.length > 0 || separate.length > 0) && (
+          <p className="mt-2 text-sm text-[var(--color-ink)]">
+            {combined.length > 0 && <>You combined {combined.join(", ")} with Arjun's journey. </>}
+            {separate.length > 0 && <>You kept {separate.join(", ")} as separate branches.</>}
+          </p>
+        )}
+        <p className="mt-2 text-xs text-[var(--color-slate)]">Your evidence-board sort and research-plan choices are saved as this module's model — built from what you pinned and picked, not typed.</p>
+      </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>
         <div className="mt-2">

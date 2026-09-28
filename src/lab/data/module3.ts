@@ -84,6 +84,65 @@ export const referenceMap = {
   ],
 };
 
+/** Four layers, shuffled, for the tap-to-assign map-building exercise. Values are
+ * taken directly from referenceMap so a correct sort reconstructs the real map. */
+export const sortableLayers = [
+  {
+    key: "actions",
+    label: "Actions",
+    items: [
+      { text: "Read reviews, inspect policy, contact host, pay", correctStage: 2 },
+      { text: "Discuss mood, dates, budget", correctStage: 0 },
+      { text: "Check out, travel home, consider review", correctStage: 5 },
+      { text: "Search, save, compare, check transport", correctStage: 1 },
+      { text: "Check in, use property, ask host for help", correctStage: 4 },
+      { text: "Read directions, pack, coordinate ferry", correctStage: 3 },
+    ],
+  },
+  {
+    key: "emotion",
+    label: "Emotion",
+    items: [
+      { text: "Anxious during handoff", correctStage: 3 },
+      { text: "Tired and reflective", correctStage: 5 },
+      { text: "Hopeful", correctStage: 0 },
+      { text: "Mild disappointment, then delight", correctStage: 4 },
+      { text: "Cautious, briefly frustrated, relieved", correctStage: 2 },
+      { text: "Interested, then overloaded", correctStage: 1 },
+    ],
+  },
+  {
+    key: "needs",
+    label: "Needs",
+    items: [
+      { text: "Risk reduction and responsiveness", correctStage: 2 },
+      { text: "Low-effort closure", correctStage: 5 },
+      { text: "Shared intent", correctStage: 0 },
+      { text: "Continuity across channels", correctStage: 3 },
+      { text: "Comparable options and realistic logistics", correctStage: 1 },
+      { text: "Expectation recovery and local support", correctStage: 4 },
+    ],
+  },
+  {
+    key: "friction",
+    label: "Friction",
+    items: [
+      { text: "Instructions assume local knowledge", correctStage: 3 },
+      { text: "Different definitions of “quiet”", correctStage: 0 },
+      { text: "Review request arrives at a poor moment", correctStage: 5 },
+      { text: "Payment retry and uncertainty about weather", correctStage: 2 },
+      { text: "Photos created a slightly different expectation", correctStage: 4 },
+      { text: "Transport details fragmented across products", correctStage: 1 },
+    ],
+  },
+];
+
+export const futureStateChoices = {
+  weak: "Booking confirmation should have a nicer design.",
+  strong: "After booking, travelers should understand the remaining uncertainties, know what they must decide next, and carry verified arrival information into the channels they will use during travel.",
+  note: "The weak version is a polish request. The strong version names the experiential outcome — understanding, decisions, and continuity — before any interface is sketched.",
+};
+
 export const futureStateGoal =
   "After booking, travelers should understand the remaining uncertainties, know what they must decide next, and carry verified arrival information into the channels they will use during travel.";
 

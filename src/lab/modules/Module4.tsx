@@ -3,15 +3,14 @@ import { ChevronDown } from "lucide-react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
-import { NoteComposer } from "@/lab/components/NoteComposer";
 import { TimelineSlider } from "@/lab/components/TimelineSlider";
-import { RatingRow } from "@/lab/components/RatingRow";
-import { ArtifactCard } from "@/lab/components/ArtifactCard";
-import { ExpertOverlay } from "@/lab/components/ExpertOverlay";
+import { RevealSteps } from "@/lab/components/RevealSteps";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
+import { OrderableList } from "@/lab/components/OrderableList";
+import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { opportunityBriefArtifact } from "@/lab/data/artifacts";
 import { module4Reading } from "@/lab/data/readingRoom";
 import {
   rahulIntro,
@@ -21,15 +20,16 @@ import {
   analysisLenses,
   rootCauseExample,
   opportunityForms,
-  prioritizationDimensions,
+  candidateOpportunities,
+  priorityRationale,
   interventionCategories,
   secondOrderQuestions,
   metricLevels,
+  metricSortItems,
   activationTeaching,
 } from "@/lab/data/module4";
 
 const TOTAL = 9;
-const CASE_LABEL = "Module 4 · Rahul's headphone return";
 
 export function Module4({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m4");
@@ -38,14 +38,14 @@ export function Module4({ lab }: { lab: LabProgressApi }) {
       <ModuleHeader eyebrow="Module 4 · Find the Leverage" question="Which moment deserves attention, and why?" section={section} totalSections={TOTAL} trace="C" />
 
       {section === 1 && <SceneBoundary lab={lab} />}
-      {section === 2 && <SceneLenses lab={lab} />}
+      {section === 2 && <SceneLenses />}
       {section === 3 && <SceneRootCause lab={lab} />}
-      {section === 4 && <SceneOpportunity lab={lab} />}
+      {section === 4 && <SceneOpportunity />}
       {section === 5 && <ScenePrioritize lab={lab} />}
       {section === 6 && <SceneInterventions lab={lab} />}
       {section === 7 && <SceneMetrics lab={lab} />}
       {section === 8 && <SceneActivation />}
-      {section === 9 && <SceneArtifact lab={lab} />}
+      {section === 9 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -61,6 +61,7 @@ export function Module4({ lab }: { lab: LabProgressApi }) {
 
 function SceneBoundary({ lab }: { lab: LabProgressApi }) {
   const value = lab.state.timeline["m4-boundary"] ?? 15;
+  const revealed = !!lab.state.flags["m4-boundary-revealed"];
   return (
     <LabCard>
       <p className="text-sm text-[var(--color-ink)]">{rahulIntro}</p>
@@ -73,13 +74,18 @@ function SceneBoundary({ lab }: { lab: LabProgressApi }) {
       </ol>
       <LabLabel>Where should “success” be measured?</LabLabel>
       <TimelineSlider value={value} onChange={(v) => lab.setTimeline("m4-boundary", v)} ticks={successBoundaries} ariaLabel="Success boundary" />
-      <NoteComposer prompt="What becomes visible or invisible at this position?" withLabel={false} onSave={(text) => lab.addNote("m4", CASE_LABEL, "note", text)} />
-      {lab.state.notebook.some((n) => n.moduleId === "m4") && <p className="mt-3 rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-sm text-[var(--color-ink)]">{successBoundaryLesson}</p>}
+      {!revealed ? (
+        <button type="button" onClick={() => lab.setFlag("m4-boundary-revealed")} className="mt-3 w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2.5 text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]">
+          See what this choice reveals
+        </button>
+      ) : (
+        <p className="mt-3 animate-fade-in-up rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-sm text-[var(--color-ink)]">{successBoundaryLesson}</p>
+      )}
     </LabCard>
   );
 }
 
-function SceneLenses({ lab }: { lab: LabProgressApi }) {
+function SceneLenses() {
   const [openId, setOpenId] = useState<string | null>(analysisLenses[0].id);
   return (
     <LabCard>
@@ -94,14 +100,13 @@ function SceneLenses({ lab }: { lab: LabProgressApi }) {
                 <ChevronDown size={14} className={`shrink-0 text-[var(--color-slate)] transition-transform ${open ? "rotate-180" : ""}`} />
               </button>
               {open && (
-                <div className="animate-fade-in-up space-y-2 border-t border-[var(--color-border)] p-3">
+                <div className="animate-fade-in-up space-y-1.5 border-t border-[var(--color-border)] p-3">
                   <p className="text-xs italic text-[var(--color-ink)]">{lens.ask}</p>
                   <ul className="space-y-0.5 text-xs text-[var(--color-slate)]">
                     {lens.inCase.map((c) => (
                       <li key={c}>• {c}</li>
                     ))}
                   </ul>
-                  <NoteComposer withLabel={false} placeholder="Apply this lens in your own words…" onSave={(text) => lab.addNote("m4", CASE_LABEL, "note", `[${lens.title}] ${text}`)} />
                 </div>
               )}
             </div>
@@ -113,45 +118,21 @@ function SceneLenses({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneRootCause({ lab }: { lab: LabProgressApi }) {
-  const steps = lab.state.multi["m4-ladder"] ?? ["", "", "", "", ""];
-  const revealed = !!lab.state.overlays["m4-ladder"];
+  const revealed = lab.state.hints["m4-ladder"] ?? 0;
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Root-cause ladder</h2>
       <p className="mt-1 rounded-xl bg-black/[0.03] p-3 text-sm font-bold text-[var(--color-ink)]">Visible problem: {rootCauseExample.problem}</p>
-      <p className="mt-2 text-xs text-[var(--color-slate)]">Ask “What made that consequential?” five times, descending toward structural causes.</p>
-      <div className="mt-2 space-y-1.5">
-        {steps.map((s, i) => (
-          <input
-            key={i}
-            value={s}
-            onChange={(e) => {
-              const next = [...steps];
-              next[i] = e.target.value;
-              lab.setMulti("m4-ladder", next);
-            }}
-            placeholder={`Step ${i + 1}…`}
-            className="w-full rounded-lg border border-[var(--color-border)] p-2 text-sm text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-          />
-        ))}
-      </div>
+      <p className="mt-2 text-xs text-[var(--color-slate)]">Click through “What made that consequential?” one rung at a time, descending toward structural causes.</p>
       <div className="mt-3">
-        <ExpertOverlay revealed={revealed} onReveal={() => lab.revealOverlay("m4-ladder")} buttonLabel="Compare with a possible ladder">
-          <ol className="space-y-1 text-sm text-[var(--color-ink)]">
-            {rootCauseExample.ladder.map((l, i) => (
-              <li key={l}>
-                {i + 1}. {l}
-              </li>
-            ))}
-          </ol>
-        </ExpertOverlay>
+        <RevealSteps steps={rootCauseExample.ladder} revealed={revealed} onRevealNext={() => lab.revealNextHint("m4-ladder")} buttonLabel="What made that consequential?" />
       </div>
       <p className="mt-2 text-xs italic text-[var(--color-slate)]">A root-cause ladder is a research agenda, not proof.</p>
     </LabCard>
   );
 }
 
-function SceneOpportunity({ lab }: { lab: LabProgressApi }) {
+function SceneOpportunity() {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Opportunity statements</h2>
@@ -164,35 +145,39 @@ function SceneOpportunity({ lab }: { lab: LabProgressApi }) {
           </div>
         ))}
       </div>
-      <div className="mt-3">
-        <NoteComposer prompt="Write your own strong, contextual opportunity statement for Rahul" withLabel={false} onSave={(text) => lab.addNote("m4", CASE_LABEL, "opportunity", text)} />
-      </div>
     </LabCard>
   );
 }
 
 function ScenePrioritize({ lab }: { lab: LabProgressApi }) {
+  const order = lab.state.multi["m4-priority-order"]?.length ? lab.state.multi["m4-priority-order"] : candidateOpportunities.map((o) => o.id);
+  const items = order.map((id) => candidateOpportunities.find((o) => o.id === id)!).filter(Boolean).map((o) => ({ id: o.id, text: `${o.text} (${o.reach})` }));
+  const revealed = !!lab.state.flags["m4-priority-revealed"];
+
+  function move(id: string, dir: -1 | 1) {
+    const idx = order.indexOf(id);
+    const next = [...order];
+    const swapWith = idx + dir;
+    if (swapWith < 0 || swapWith >= next.length) return;
+    [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
+    lab.setMulti("m4-priority-order", next);
+  }
+
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Prioritization studio</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Identify three opportunities, then evaluate one across five dimensions — rationale matters more than the rating.</p>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Four candidate opportunities from Rahul's case. Reorder them from most to least worth investigating.</p>
       <div className="mt-2">
-        <NoteComposer prompt="List three candidate opportunities (one per note)" onSave={(text) => lab.addNote("m4", CASE_LABEL, "opportunity", text)} />
+        <LabLabel>Consider: user impact, frequency, journey leverage, strategic relevance, evidence confidence</LabLabel>
+        <OrderableList items={items} onMove={move} />
       </div>
-      <LabLabel>Evaluate your top candidate</LabLabel>
-      <div className="space-y-2">
-        {prioritizationDimensions.map((d) => (
-          <RatingRow
-            key={d.key}
-            label={d.label}
-            description={d.description}
-            level={lab.state.selections[`m4-rating-${d.key}`] ?? ""}
-            onLevel={(v) => lab.setSelection(`m4-rating-${d.key}`, v)}
-            rationale={lab.state.freeText[`m4-rationale-${d.key}`] ?? ""}
-            onRationale={(v) => lab.setFreeText(`m4-rationale-${d.key}`, v)}
-          />
-        ))}
-      </div>
+      {!revealed ? (
+        <button type="button" onClick={() => lab.setFlag("m4-priority-revealed")} className="mt-3 w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2.5 text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]">
+          Compare with a possible ranking
+        </button>
+      ) : (
+        <p className="mt-3 animate-fade-in-up rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-xs text-[var(--color-ink)]">{priorityRationale}</p>
+      )}
       <p className="mt-2 text-xs italic text-[var(--color-slate)]">Feasibility is a second, separate conversation — don't confuse importance with implementation ease.</p>
     </LabCard>
   );
@@ -202,19 +187,15 @@ function SceneInterventions({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Interventions as a portfolio, not a feature contest</h2>
-      <div className="mt-2 space-y-2">
+      <p className="mt-1 text-xs text-[var(--color-slate)]">For each category, pick the intervention that best fits Rahul's actual situation.</p>
+      <div className="mt-2 space-y-4">
         {interventionCategories.map((c) => (
-          <div key={c.key} className="rounded-xl border border-[var(--color-border)] p-3">
+          <div key={c.key}>
             <p className="text-sm font-bold text-[var(--color-ink)]">{c.label}</p>
             <p className="text-xs text-[var(--color-slate)]">{c.detail}</p>
-            <p className="mt-0.5 text-xs italic text-[var(--color-ink)]">e.g. {c.example}</p>
-            <textarea
-              value={lab.state.freeText[`m4-intervention-${c.key}`] ?? ""}
-              onChange={(e) => lab.setFreeText(`m4-intervention-${c.key}`, e.target.value)}
-              rows={1}
-              placeholder="Your intervention in this category…"
-              className="mt-2 w-full resize-none rounded-lg border border-[var(--color-border)] p-2 text-xs text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-            />
+            <div className="mt-1.5">
+              <ChoiceReveal options={c.options} selected={lab.state.selections[`m4-intervention-${c.key}`] ?? null} onSelect={(id) => lab.setSelection(`m4-intervention-${c.key}`, id)} />
+            </div>
           </div>
         ))}
       </div>
@@ -229,24 +210,26 @@ function SceneInterventions({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneMetrics({ lab }: { lab: LabProgressApi }) {
+  const items = metricSortItems.map((it, i) => ({ id: `metric-${i}`, text: it.text, correctColumn: it.correctColumn }));
+  const assignments: Record<string, number | undefined> = {};
+  for (const it of items) {
+    const v = lab.state.selections[`m4-metric-${it.id}`];
+    if (v !== undefined) assignments[it.id] = Number(v);
+  }
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Connecting the journey to metrics</h2>
-      <div className="mt-2 space-y-2">
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Sort each candidate metric into the level it belongs to.</p>
+      <div className="mt-2 space-y-1.5">
         {metricLevels.map((m) => (
-          <div key={m.level} className="rounded-xl bg-black/[0.03] p-3">
-            <p className="text-sm font-bold text-[var(--color-ink)]">{m.level}</p>
-            <p className="text-xs italic text-[var(--color-slate)]">{m.question}</p>
-            <p className="mt-1 text-xs text-[var(--color-ink)]">{m.example}</p>
-            <textarea
-              value={lab.state.freeText[`m4-metric-${m.level}`] ?? ""}
-              onChange={(e) => lab.setFreeText(`m4-metric-${m.level}`, e.target.value)}
-              rows={1}
-              placeholder="Your version for Rahul's case…"
-              className="mt-2 w-full resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2 text-xs text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-            />
-          </div>
+          <p key={m.level} className="text-xs text-[var(--color-slate)]">
+            <span className="font-bold text-[var(--color-ink)]">{m.level}: </span>
+            {m.question}
+          </p>
         ))}
+      </div>
+      <div className="mt-3">
+        <EvidenceBoard columns={metricLevels.map((m) => m.level)} items={items} assignments={assignments} checkable onAssign={(id, col) => lab.setSelection(`m4-metric-${id}`, String(col))} />
       </div>
       <p className="mt-2 text-xs italic text-[var(--color-slate)]">Pair perception (NPS, satisfaction) with behavior and operational reality — never treat it as the only outcome.</p>
     </LabCard>
@@ -278,11 +261,36 @@ function SceneActivation() {
   );
 }
 
-function SceneArtifact({ lab }: { lab: LabProgressApi }) {
-  const values = lab.state.artifacts[opportunityBriefArtifact.id] ?? {};
+function SceneRecap({ lab }: { lab: LabProgressApi }) {
+  const order = lab.state.multi["m4-priority-order"]?.length ? lab.state.multi["m4-priority-order"] : candidateOpportunities.map((o) => o.id);
+  const top = candidateOpportunities.find((o) => o.id === order[0]);
+  const chosenInterventions = interventionCategories.map((c) => ({
+    label: c.label,
+    pick: c.options.find((o) => o.id === lab.state.selections[`m4-intervention-${c.key}`])?.text,
+  }));
   return (
     <div className="space-y-4">
-      <ArtifactCard def={opportunityBriefArtifact} values={values} onChange={(k, v) => lab.setArtifactField(opportunityBriefArtifact.id, k, v)} />
+      <LabCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Prioritized Opportunity Brief</p>
+        {top && (
+          <p className="mt-2 text-sm text-[var(--color-ink)]">
+            Top priority: <span className="font-bold">{top.text}</span>
+          </p>
+        )}
+        {chosenInterventions.some((c) => c.pick) && (
+          <ul className="mt-2 space-y-1 text-xs text-[var(--color-ink)]">
+            {chosenInterventions
+              .filter((c) => c.pick)
+              .map((c) => (
+                <li key={c.label}>
+                  <span className="font-bold">{c.label}: </span>
+                  {c.pick}
+                </li>
+              ))}
+          </ul>
+        )}
+        <p className="mt-2 text-xs text-[var(--color-slate)]">This brief is built from your ranking and your intervention picks — the model you assembled, not typed.</p>
+      </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>
         <div className="mt-2">

@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useLabProgress } from "@/lab/state/useLabProgress";
-import { NotebookDrawer } from "@/lab/components/NotebookDrawer";
 import { StudioHome } from "@/lab/StudioHome";
-import { CaseNotebookScreen } from "@/lab/CaseNotebookScreen";
 import { ConceptShelfScreen } from "@/lab/ConceptShelfScreen";
 import { ReadingRoomScreen } from "@/lab/ReadingRoomScreen";
 import { PracticeStudio } from "@/lab/PracticeStudio";
@@ -13,7 +11,7 @@ import { Module3 } from "@/lab/modules/Module3";
 import { Module4 } from "@/lab/modules/Module4";
 import { Module5 } from "@/lab/modules/Module5";
 
-type Area = "home" | "m1" | "m2" | "m3" | "m4" | "m5" | "notebook" | "shelf" | "reading" | "practice" | "capstone";
+type Area = "home" | "m1" | "m2" | "m3" | "m4" | "m5" | "shelf" | "reading" | "practice" | "capstone";
 
 const AREA_KEY = "concepts-lab:area";
 
@@ -24,7 +22,6 @@ const navItems: { id: Area; label: string }[] = [
   { id: "m3", label: "Module 3" },
   { id: "m4", label: "Module 4" },
   { id: "m5", label: "Module 5" },
-  { id: "notebook", label: "Case Notebook" },
   { id: "shelf", label: "Concept Shelf" },
   { id: "reading", label: "Reading Room" },
   { id: "practice", label: "Practice Studio" },
@@ -76,13 +73,10 @@ export default function ConceptsLab() {
       {area === "m3" && <Module3 lab={lab} />}
       {area === "m4" && <Module4 lab={lab} />}
       {area === "m5" && <Module5 lab={lab} />}
-      {area === "notebook" && <CaseNotebookScreen lab={lab} />}
       {area === "shelf" && <ConceptShelfScreen />}
       {area === "reading" && <ReadingRoomScreen />}
       {area === "practice" && <PracticeStudio lab={lab} />}
       {area === "capstone" && <PortfolioCapstone lab={lab} />}
-
-      <NotebookDrawer lab={lab} />
     </div>
   );
 }

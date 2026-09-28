@@ -9,6 +9,7 @@ export interface ModuleMeta {
   estimate: string;
   trace: TraceLetter;
   artifact: string;
+  sections: number;
 }
 
 export const moduleMetas: ModuleMeta[] = [
@@ -21,6 +22,7 @@ export const moduleMetas: ModuleMeta[] = [
     estimate: "35–50 minutes",
     trace: "T",
     artifact: "Journey Frame Card",
+    sections: 9,
   },
   {
     id: "m2",
@@ -31,6 +33,7 @@ export const moduleMetas: ModuleMeta[] = [
     estimate: "50–70 minutes",
     trace: "R",
     artifact: "Evidence Board and Research Plan",
+    sections: 10,
   },
   {
     id: "m3",
@@ -41,6 +44,7 @@ export const moduleMetas: ModuleMeta[] = [
     estimate: "55–75 minutes",
     trace: "A",
     artifact: "Current-State Journey Map",
+    sections: 8,
   },
   {
     id: "m4",
@@ -51,6 +55,7 @@ export const moduleMetas: ModuleMeta[] = [
     estimate: "55–75 minutes",
     trace: "C",
     artifact: "Prioritized Opportunity Brief",
+    sections: 9,
   },
   {
     id: "m5",
@@ -61,5 +66,6 @@ export const moduleMetas: ModuleMeta[] = [
     estimate: "60–90 minutes",
     trace: "E",
     artifact: "Interview-ready case response",
+    sections: 13,
   },
 ];

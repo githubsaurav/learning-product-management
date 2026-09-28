@@ -1,14 +1,13 @@
-import { useMemo } from "react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
 import { TimelineSlider } from "@/lab/components/TimelineSlider";
-import { NoteComposer } from "@/lab/components/NoteComposer";
-import { ArtifactCard } from "@/lab/components/ArtifactCard";
+import { MadLibSentence } from "@/lab/components/MadLibSentence";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
+import { SelectChips } from "@/lab/components/SelectChips";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { journeyFrameCard } from "@/lab/data/artifacts";
 import { module1Reading } from "@/lab/data/readingRoom";
 import {
   meeraIntro,
@@ -18,16 +17,15 @@ import {
   sequenceLens,
   teams,
   framingDecisions,
-  framingExample,
-  framingEditEffects,
+  madLibBlanks,
   cameraLenses,
   thinkingTraps,
   reflectionQuestions,
   transferPrompts,
+  transferFramings,
 } from "@/lab/data/module1";
 
 const TOTAL = 9;
-const CASE_LABEL = "Module 1 · Meera's airport ride";
 
 export function Module1({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m1");
@@ -44,7 +42,7 @@ export function Module1({ lab }: { lab: LabProgressApi }) {
       {section === 6 && <SceneTraps />}
       {section === 7 && <SceneReflection lab={lab} />}
       {section === 8 && <SceneTransfer lab={lab} />}
-      {section === 9 && <SceneArtifact lab={lab} />}
+      {section === 9 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -60,16 +58,20 @@ export function Module1({ lab }: { lab: LabProgressApi }) {
 
 function SceneBeginning({ lab }: { lab: LabProgressApi }) {
   const value = lab.state.timeline["m1-begin"] ?? 50;
+  const revealed = !!lab.state.flags["m1-begin-revealed"];
   return (
     <LabCard>
       <p className="text-sm text-[var(--color-ink)]">{meeraIntro}</p>
       <p className="mt-3 rounded-xl bg-black/[0.03] p-3 text-sm font-bold text-[var(--color-ink)]">Has Meera's airport journey started?</p>
       <div className="mt-3">
-        <LabLabel>Place the marker where you think the journey begins</LabLabel>
+        <LabLabel>Drag the marker to where you think the journey begins</LabLabel>
         <TimelineSlider value={value} onChange={(v) => lab.setTimeline("m1-begin", v)} ticks={beginningTicks} ariaLabel="Journey beginning" />
       </div>
-      <NoteComposer prompt="Why there?" withLabel={false} onSave={(text) => lab.addNote("m1", CASE_LABEL, "note", `Beginning placed at ~${value}%: ${text}`)} />
-      {lab.state.notebook.some((n) => n.moduleId === "m1" && n.text.includes("Beginning placed")) && (
+      {!revealed ? (
+        <button type="button" onClick={() => lab.setFlag("m1-begin-revealed")} className="mt-3 w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2.5 text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]">
+          See why this is a real decision
+        </button>
+      ) : (
         <p className="mt-3 animate-fade-in-up rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-sm text-[var(--color-ink)]">{scopeReveal}</p>
       )}
     </LabCard>
@@ -144,7 +146,11 @@ function SceneThreeTeams({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneFraming({ lab }: { lab: LabProgressApi }) {
-  const text = lab.state.freeText["m1-framing"] ?? framingExample;
+  const values: Record<string, string> = {};
+  for (const blank of madLibBlanks) {
+    const v = lab.state.selections[`m1-framing-${blank.key}`];
+    if (v) values[blank.key] = v;
+  }
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">The five framing decisions</h2>
@@ -157,24 +163,13 @@ function SceneFraming({ lab }: { lab: LabProgressApi }) {
       </ul>
 
       <div className="mt-4 rounded-xl bg-black/[0.03] p-3">
-        <LabLabel>Edit the framing sentence — challenge words that feel too broad</LabLabel>
-        <textarea
-          value={text}
-          onChange={(e) => lab.setFreeText("m1-framing", e.target.value)}
-          rows={4}
-          className="w-full resize-none rounded-lg border border-[var(--color-border)] bg-[var(--color-surface)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
+        <LabLabel>Build the framing sentence — tap each blank and choose</LabLabel>
+        <MadLibSentence
+          template="We are examining how {actor} tries to {goal} when {scenario}, from {begin} until {end}, so that we can understand {objective}."
+          blanks={madLibBlanks}
+          values={values}
+          onChoose={(key, id) => lab.setSelection(`m1-framing-${key}`, id)}
         />
-      </div>
-
-      <div className="mt-3">
-        <LabLabel>What changes when you edit each part</LabLabel>
-        <ul className="space-y-1">
-          {framingEditEffects.map((e) => (
-            <li key={e} className="text-xs text-[var(--color-slate)]">
-              • {e}
-            </li>
-          ))}
-        </ul>
       </div>
     </LabCard>
   );
@@ -233,10 +228,15 @@ function SceneReflection({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Reflection canvas</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Write freely. Then apply an evidence label — which of your statements describe evidence, and which describe interpretation?</p>
-      <div className="mt-3 space-y-3">
-        {reflectionQuestions.map((q) => (
-          <NoteComposer key={q} prompt={q} onSave={(text, label) => lab.addNote("m1", CASE_LABEL, "note", text, label)} />
+      <p className="mt-1 text-xs text-[var(--color-slate)]">For each question, pick the option that best fits the evidence in the story.</p>
+      <div className="mt-3 space-y-5">
+        {reflectionQuestions.map((rq, i) => (
+          <div key={rq.question}>
+            <p className="text-sm font-bold text-[var(--color-ink)]">{rq.question}</p>
+            <div className="mt-2">
+              <ChoiceReveal options={rq.options} selected={lab.state.selections[`m1-reflect-${i}`] ?? null} onSelect={(id) => lab.setSelection(`m1-reflect-${i}`, id)} />
+            </div>
+          </div>
         ))}
       </div>
     </LabCard>
@@ -244,43 +244,49 @@ function SceneReflection({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneTransfer({ lab }: { lab: LabProgressApi }) {
-  const chosen = lab.state.selections["m1-transfer"] ?? transferPrompts[0];
+  const chosen = lab.state.selections["m1-transfer"] ?? "";
+  const framing = chosen ? transferFramings[chosen] : null;
+  const pick = lab.state.selections["m1-transfer-pick"] ?? null;
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Transfer studio</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Choose one situation, then write only a framing sentence — not a map yet.</p>
-      <div className="mt-2 flex flex-wrap gap-1.5">
-        {transferPrompts.map((p) => (
-          <button
-            key={p}
-            type="button"
-            onClick={() => lab.setSelection("m1-transfer", p)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-              chosen === p ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-ink)]"
-            }`}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
-      <div className="mt-3">
-        <NoteComposer
-          prompt={`We are examining how [actor] tries to [goal] when [scenario], from [beginning] until [ending], so that we can understand [learning objective].`}
-          withLabel={false}
-          onSave={(text) => lab.addNote("m1", `Transfer · ${chosen}`, "note", text)}
-        />
-      </div>
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Choose a situation, then pick the stronger framing sentence for it.</p>
+      <SelectChips options={transferPrompts} selected={chosen ? [chosen] : []} onToggle={(p) => lab.setSelection("m1-transfer", p)} />
+      {framing && (
+        <div className="mt-3">
+          <ChoiceReveal
+            options={[
+              { id: "weak", text: framing.weak, note: framing.note },
+              { id: "strong", text: framing.strong, note: framing.note, strongest: true },
+            ]}
+            selected={pick}
+            onSelect={(id) => lab.setSelection("m1-transfer-pick", id)}
+          />
+        </div>
+      )}
     </LabCard>
   );
 }
 
-function SceneArtifact({ lab }: { lab: LabProgressApi }) {
-  const values = lab.state.artifacts[journeyFrameCard.id] ?? {};
-  const savedCount = useMemo(() => Object.values(values).filter((v) => v.trim()).length, [values]);
+function SceneRecap({ lab }: { lab: LabProgressApi }) {
+  const sentenceParts = madLibBlanks.map((b) => {
+    const chosenId = lab.state.selections[`m1-framing-${b.key}`];
+    return b.options.find((o) => o.id === chosenId)?.text ?? `…`;
+  });
+  const beginTick = beginningTicks.find((t) => Math.abs(t.position - (lab.state.timeline["m1-begin"] ?? 50)) < 15)?.label ?? "somewhere in between";
+
   return (
     <div className="space-y-4">
-      <ArtifactCard def={journeyFrameCard} values={values} onChange={(k, v) => lab.setArtifactField(journeyFrameCard.id, k, v)} />
-      {savedCount > 0 && <p className="text-center text-xs text-[var(--color-slate)]">{savedCount} field{savedCount === 1 ? "" : "s"} saved automatically.</p>}
+      <LabCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Journey Frame</p>
+        <p className="mt-2 text-sm text-[var(--color-ink)]">
+          You placed Meera's journey beginning around <span className="font-bold">{beginTick}</span>.
+        </p>
+        <p className="mt-2 rounded-lg bg-black/[0.03] p-3 text-sm text-[var(--color-ink)]">
+          We are examining how {sentenceParts[0]} tries to {sentenceParts[1]} when {sentenceParts[2]}, from {sentenceParts[3]} until {sentenceParts[4]}, so that we can understand {sentenceParts[5]}.
+        </p>
+        <p className="mt-2 text-xs text-[var(--color-slate)]">This sentence, plus the scopes you gave the three teams, is your Journey Frame for this case — built entirely from the choices you made.</p>
+      </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>
         <div className="mt-2">

@@ -22,8 +22,8 @@ export default function LessonHub({
   const day1Started = hasProgress("daily-product-intuition:day1", (p) => (p as { screen?: string })?.screen !== "welcome");
   const storyStarted = hasProgress("vanishing-cart:progress", (p) => (p as { scene?: number })?.scene !== 1);
   const conceptsStarted = hasProgress("concepts-lab:progress", (p) => {
-    const state = p as { notebook?: unknown[]; artifacts?: Record<string, unknown> };
-    return (state.notebook?.length ?? 0) > 0 || Object.keys(state.artifacts ?? {}).length > 0;
+    const state = p as { selections?: Record<string, string>; multi?: Record<string, string[]> };
+    return Object.keys(state.selections ?? {}).length > 0 || Object.keys(state.multi ?? {}).length > 0;
   });
 
   return (

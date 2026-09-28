@@ -139,13 +139,148 @@ export const synthesisRules = [
   "Never manufacture a smooth “average journey” that none of the participants actually experienced.",
 ];
 
+export const firstExplanationOptions = [
+  "He didn't trust the delivery time estimate",
+  "The prices were too high",
+  "He wasn't hungry enough to bother",
+  "The app was too slow or confusing to use",
+  "Nothing in particular looked appealing that night",
+];
+
+export interface FollowUpQuestion {
+  id: string;
+  text: string;
+  dimension: string;
+  leading: boolean;
+  note: string;
+}
+
+export const followUpQuestions: FollowUpQuestion[] = [
+  {
+    id: "q1",
+    text: "Were the extra fees the reason you left?",
+    dimension: "consequence",
+    leading: true,
+    note: "Leading — it hands Arjun an answer to agree with instead of letting him surprise you.",
+  },
+  {
+    id: "q2",
+    text: "What went through your mind when you saw the final total?",
+    dimension: "decision criterion",
+    leading: false,
+    note: "Open — invites Arjun to describe his own reasoning, whatever it turns out to be.",
+  },
+  {
+    id: "q3",
+    text: "What else could you have done for dinner instead?",
+    dimension: "alternative",
+    leading: false,
+    note: "Open — surfaces the real competitive set, including cereal, without naming it.",
+  },
+  {
+    id: "q4",
+    text: "Do you usually find delivery apps too slow?",
+    dimension: "expectation",
+    leading: true,
+    note: "Leading — assumes a general complaint rather than asking about this specific night.",
+  },
+  {
+    id: "q5",
+    text: "What happened right before you opened the app?",
+    dimension: "trigger",
+    leading: false,
+    note: "Open — recovers context chronologically instead of asking for an opinion.",
+  },
+  {
+    id: "q6",
+    text: "Would faster delivery have changed your decision?",
+    dimension: "expectation",
+    leading: true,
+    note: "Leading — asks Arjun to predict a hypothetical, which people are generally poor at.",
+  },
+];
+
+export const synthesisPairs = [
+  {
+    name: "Sana",
+    story: otherStories[0].story,
+    note: "Sana's timing constraint (a hard cutoff) and Arjun's tiredness are different decision drivers — keep as a separate branch even though both are “late-night.”",
+  },
+  {
+    name: "Dev",
+    story: otherStories[1].story,
+    note: "Dev's problem is group coordination, structurally different from Arjun's solo decision fatigue — a genuinely separate branch, not a variation.",
+  },
+  {
+    name: "Kavya",
+    story: otherStories[2].story,
+    note: "Kavya and Arjun both hit “options feel effortful/risky” at a similar stage — close enough in goal and structure that their journeys could reasonably combine.",
+  },
+];
+
 export const researchPlanQuestions = [
-  "The decision the team needs to make",
-  "The primary actor and context",
-  "What is already known",
-  "The riskiest assumptions",
-  "Whom to recruit",
-  "What behaviors or events to investigate",
-  "Which methods complement one another",
-  "What would count as disconfirming evidence",
+  {
+    question: "The decision the team needs to make",
+    options: [
+      { id: "a", text: "Whether Arjun personally should get a discount", note: "Too narrow — one person's cart isn't a team decision." },
+      { id: "b", text: "Whether to invest in reducing late-night cart abandonment", note: "Names a decision the evidence can actually inform.", strongest: true },
+      { id: "c", text: "Whether the app's colors should change", note: "Unrelated to anything the evidence points to." },
+    ],
+  },
+  {
+    question: "The primary actor and context",
+    options: [
+      { id: "a", text: "All Swiggy users, generally", note: "Too broad to design research around." },
+      { id: "b", text: "Solo diners ordering late at night after a long day", note: "Matches exactly what the evidence and pattern (Source E) point to.", strongest: true },
+      { id: "c", text: "Large groups ordering for an office lunch", note: "A different, unrelated context (closer to Dev's situation)." },
+    ],
+  },
+  {
+    question: "What is already known",
+    options: [
+      { id: "a", text: "Arjun definitely abandoned due to price", note: "This treats an unconfirmed hypothesis as known fact." },
+      { id: "b", text: "Late-night solo sessions convert less often, and Arjun's session shows several interacting frictions", note: "This is what the evidence actually supports so far.", strongest: true },
+      { id: "c", text: "Nothing — we should start from zero", note: "Ignores the real evidence already collected (Sources A–F)." },
+    ],
+  },
+  {
+    question: "The riskiest assumptions",
+    options: [
+      { id: "a", text: "That every late-night session ends like Arjun's", note: "A real risk — one story was never meant to represent everyone.", strongest: true },
+      { id: "b", text: "That Swiggy's logo is the right shade of orange", note: "Not a decision-relevant assumption." },
+      { id: "c", text: "That delivery riders own their vehicles", note: "Irrelevant to this decision." },
+    ],
+  },
+  {
+    question: "Whom to recruit",
+    options: [
+      { id: "a", text: "Only customers who completed a late-night order successfully", note: "A classic trap — this overrepresents people the product already works for." },
+      { id: "b", text: "A mix including people who abandoned a late-night cart, like Arjun", note: "Captures the behavior actually in question, not just the success cases.", strongest: true },
+      { id: "c", text: "Only the internal product team's own opinions", note: "Internal enthusiasm isn't evidence of customer need." },
+    ],
+  },
+  {
+    question: "What behaviors or events to investigate",
+    options: [
+      { id: "a", text: "Only whether the app crashed", note: "Too narrow — nothing suggests a technical failure here." },
+      { id: "b", text: "Filter changes, cart edits, coupon attempts, and the final abandon moment", note: "Matches the actual signals already visible in Arjun's session.", strongest: true },
+      { id: "c", text: "How many total employees work at Swiggy", note: "Unrelated to the customer journey." },
+    ],
+  },
+  {
+    question: "Which methods complement one another",
+    options: [
+      { id: "a", text: "Interviews only", note: "Explains motivation but can't show how common the pattern is." },
+      { id: "b", text: "Interviews plus analytics plus support transcripts", note: "Each window covers a different blind spot of the others.", strongest: true },
+      { id: "c", text: "Only reading competitor app reviews", note: "Tells you about a different product, not this journey." },
+    ],
+  },
+  {
+    question: "What would count as disconfirming evidence",
+    options: [
+      { id: "a", text: "Nothing — the hypothesis feels obviously true", note: "Treating a hypothesis as unfalsifiable is a warning sign, not a plan." },
+      { id: "b", text: "Several interviewees citing a cause unrelated to price, delivery time, or fatigue", note: "A concrete signal that would force the team to revise its thinking.", strongest: true },
+      { id: "c", text: "A single five-star app store review", note: "Irrelevant to whether the abandonment hypothesis holds." },
+    ],
+  },
 ];

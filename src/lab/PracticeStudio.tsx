@@ -1,18 +1,46 @@
 import { useState } from "react";
 import { LabCard, LabLabel } from "@/lab/components/Card";
-import { NoteComposer } from "@/lab/components/NoteComposer";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
+import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { framingPrompts, teardownFlows, teardownQuestions, reconstructionCases, opportunityClinicForms, interviewRehearsalPrompts } from "@/lab/data/practiceStudio";
+import {
+  framingSprints,
+  teardownFlows,
+  teardownQuestions,
+  reconstructionCases,
+  reconstructionColumns,
+  reconstructionItems,
+  opportunityClinicPainPoints,
+  interviewRehearsalPrompts,
+} from "@/lab/data/practiceStudio";
 
 type Mode = "A" | "B" | "C" | "D" | "E";
 
 const modes: { id: Mode; title: string; detail: string }[] = [
-  { id: "A", title: "Journey framing sprints", detail: "A broad prompt, five minutes, one Journey Frame Card." },
+  { id: "A", title: "Journey framing sprints", detail: "A broad prompt — pick the stronger framing." },
   { id: "B", title: "Journey teardown", detail: "Zoom out from one screen to the whole journey." },
-  { id: "C", title: "Evidence reconstruction", detail: "Build an evidence board and mark uncertainty." },
-  { id: "D", title: "Opportunity clinic", detail: "Rewrite a pain point through four forms." },
-  { id: "E", title: "Interview rehearsal", detail: "Silent whiteboard or typed narration." },
+  { id: "C", title: "Evidence reconstruction", detail: "Sort evidence by how confident it really is." },
+  { id: "D", title: "Opportunity clinic", detail: "Watch a pain point become an opportunity statement." },
+  { id: "E", title: "Interview rehearsal", detail: "Pick a prompt, compare your outline to one path through it." },
 ];
+
+function PickOne({ options, selKey, lab }: { options: string[]; selKey: string; lab: LabProgressApi }) {
+  const chosen = lab.state.selections[selKey] ?? "";
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {options.map((o) => (
+        <button
+          key={o}
+          type="button"
+          onClick={() => lab.setSelection(selKey, o)}
+          className={`rounded-full border px-2.5 py-1.5 text-xs font-medium transition ${chosen === o ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-ink)]"}`}
+        >
+          {o}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function PracticeStudio({ lab }: { lab: LabProgressApi }) {
   const [mode, setMode] = useState<Mode>("A");
@@ -21,7 +49,7 @@ export function PracticeStudio({ lab }: { lab: LabProgressApi }) {
     <div className="space-y-4 pb-10">
       <div>
         <h1 className="text-lg font-black text-[var(--color-ink)]">Practice studio</h1>
-        <p className="mt-1 text-sm text-[var(--color-slate)]">Deliberate rehearsal, not examination.</p>
+        <p className="mt-1 text-sm text-[var(--color-slate)]">Deliberate rehearsal, not examination — every mode is click-and-compare.</p>
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -47,60 +75,27 @@ export function PracticeStudio({ lab }: { lab: LabProgressApi }) {
       {mode === "C" && <ModeC lab={lab} />}
       {mode === "D" && <ModeD lab={lab} />}
       {mode === "E" && <ModeE lab={lab} />}
-
-      <RecentPractice lab={lab} mode={mode} />
-    </div>
-  );
-}
-
-function RecentPractice({ lab, mode }: { lab: LabProgressApi; mode: Mode }) {
-  const records = lab.state.practice.filter((r) => r.mode === mode).slice(-5).reverse();
-  if (records.length === 0) return null;
-  return (
-    <LabCard>
-      <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Saved from this mode</p>
-      <div className="mt-2 space-y-2">
-        {records.map((r) => (
-          <div key={r.id} className="rounded-lg bg-black/[0.03] p-2.5 text-xs">
-            <p className="font-bold text-[var(--color-ink)]">{r.prompt}</p>
-            <p className="mt-0.5 text-[var(--color-slate)]">{r.response}</p>
-          </div>
-        ))}
-      </div>
-    </LabCard>
-  );
-}
-
-function PickOne({ options, selKey, lab }: { options: string[]; selKey: string; lab: LabProgressApi }) {
-  const chosen = lab.state.selections[selKey] ?? "";
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((o) => (
-        <button
-          key={o}
-          type="button"
-          onClick={() => lab.setSelection(selKey, o)}
-          className={`rounded-full border px-2.5 py-1.5 text-xs font-medium transition ${chosen === o ? "border-[var(--color-accent)] bg-[var(--color-accent-soft)] text-[var(--color-ink)]" : "border-[var(--color-border)] text-[var(--color-ink)]"}`}
-        >
-          {o}
-        </button>
-      ))}
     </div>
   );
 }
 
 function ModeA({ lab }: { lab: LabProgressApi }) {
   const prompt = lab.state.selections["practice-a-prompt"] ?? "";
+  const sprint = framingSprints.find((f) => f.prompt === prompt);
   return (
     <LabCard>
-      <LabLabel>Pick a prompt (~5 minutes)</LabLabel>
-      <PickOne options={framingPrompts} selKey="practice-a-prompt" lab={lab} />
-      {prompt && (
-        <div className="mt-3 space-y-3">
-          <NoteComposer prompt={`Write a framing sentence for: "${prompt}"`} withLabel={false} onSave={(text) => lab.addPractice("A", prompt, text)} />
-          <NoteComposer prompt="What did you include that changes the journey materially?" withLabel={false} onSave={(text) => lab.addPractice("A", prompt, text)} />
-          <NoteComposer prompt="What did you assume?" withLabel={false} onSave={(text) => lab.addPractice("A", prompt, text)} />
-          <NoteComposer prompt="What would you need to learn first?" withLabel={false} onSave={(text) => lab.addPractice("A", prompt, text)} />
+      <LabLabel>Pick a prompt</LabLabel>
+      <PickOne options={framingSprints.map((f) => f.prompt)} selKey="practice-a-prompt" lab={lab} />
+      {sprint && (
+        <div className="mt-3">
+          <ChoiceReveal
+            options={[
+              { id: "weak", text: sprint.weak, note: "Centers the product's own activity, not the person's outcome." },
+              { id: "strong", text: sprint.strong, note: "Names a specific person, state, and outcome.", strongest: true },
+            ]}
+            selected={lab.state.selections[`practice-a-pick-${prompt}`] ?? null}
+            onSelect={(id) => lab.setSelection(`practice-a-pick-${prompt}`, id)}
+          />
         </div>
       )}
     </LabCard>
@@ -114,9 +109,14 @@ function ModeB({ lab }: { lab: LabProgressApi }) {
       <LabLabel>Pick a flow to zoom out from</LabLabel>
       <PickOne options={teardownFlows} selKey="practice-b-flow" lab={lab} />
       {flow && (
-        <div className="mt-3 space-y-3">
-          {teardownQuestions.map((q) => (
-            <NoteComposer key={q} prompt={q} withLabel={false} onSave={(text) => lab.addPractice("B", flow, `${q} ${text}`)} />
+        <div className="mt-3 space-y-4">
+          {teardownQuestions.map((tq, i) => (
+            <div key={tq.question}>
+              <p className="text-sm font-bold text-[var(--color-ink)]">{tq.question}</p>
+              <div className="mt-1.5">
+                <ChoiceReveal options={tq.options} selected={lab.state.selections[`practice-b-${flow}-${i}`] ?? null} onSelect={(id) => lab.setSelection(`practice-b-${flow}-${i}`, id)} />
+              </div>
+            </div>
           ))}
         </div>
       )}
@@ -126,14 +126,22 @@ function ModeB({ lab }: { lab: LabProgressApi }) {
 
 function ModeC({ lab }: { lab: LabProgressApi }) {
   const kase = lab.state.selections["practice-c-case"] ?? "";
+  const items = reconstructionItems.map((it, i) => ({ id: `rc-${i}`, text: it.text, correctColumn: it.correctColumn }));
+  const assignments: Record<string, number | undefined> = {};
+  for (const it of items) {
+    const v = lab.state.selections[`practice-c-${kase}-${it.id}`];
+    if (v !== undefined) assignments[it.id] = Number(v);
+  }
   return (
     <LabCard>
       <LabLabel>Pick a suggested case</LabLabel>
       <PickOne options={reconstructionCases} selKey="practice-c-case" lab={lab} />
       {kase && (
-        <div className="mt-3 space-y-3">
-          <p className="text-xs text-[var(--color-slate)]">Note what you'd expect to find as evidence, and label each note by type.</p>
-          <NoteComposer prompt="Add an evidence note" onSave={(text, label) => lab.addNote("practice", `Practice · ${kase}`, "observation", text, label)} />
+        <div className="mt-3">
+          <p className="text-xs text-[var(--color-slate)]">Sort these example statements by how confident each one really is.</p>
+          <div className="mt-2">
+            <EvidenceBoard columns={reconstructionColumns} items={items} assignments={assignments} checkable onAssign={(id, col) => lab.setSelection(`practice-c-${kase}-${id}`, String(col))} />
+          </div>
         </div>
       )}
     </LabCard>
@@ -141,26 +149,29 @@ function ModeC({ lab }: { lab: LabProgressApi }) {
 }
 
 function ModeD({ lab }: { lab: LabProgressApi }) {
-  const [painPoint, setPainPoint] = useState("");
+  const chosen = lab.state.selections["practice-d-pain"] ?? "";
+  const pain = opportunityClinicPainPoints.find((p) => p.text === chosen);
+  const revealed = lab.state.hints[`practice-d-${chosen}`] ?? 0;
   return (
     <LabCard>
-      <LabLabel>Bring a pain point from any journey</LabLabel>
-      <textarea
-        value={painPoint}
-        onChange={(e) => setPainPoint(e.target.value)}
-        rows={2}
-        placeholder="Describe the pain point…"
-        className="w-full resize-none rounded-lg border border-[var(--color-border)] p-2.5 text-sm text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-      />
-      {painPoint && (
-        <div className="mt-3 space-y-3">
-          {opportunityClinicForms.map((form) => (
-            <NoteComposer key={form} prompt={`Rewrite it as: ${form}`} withLabel={false} onSave={(text) => lab.addPractice("D", painPoint, `[${form}] ${text}`)} />
-          ))}
-          <LabLabel>At least three structurally different interventions</LabLabel>
-          {[0, 1, 2].map((i) => (
-            <NoteComposer key={i} withLabel={false} placeholder={`Intervention ${i + 1}…`} onSave={(text) => lab.addPractice("D", painPoint, `Intervention: ${text}`)} />
-          ))}
+      <LabLabel>Pick a pain point</LabLabel>
+      <PickOne options={opportunityClinicPainPoints.map((p) => p.text)} selKey="practice-d-pain" lab={lab} />
+      {pain && (
+        <div className="mt-3">
+          <p className="text-xs text-[var(--color-slate)]">Click through to see it rewritten across all four forms.</p>
+          <div className="mt-2 space-y-1.5">
+            {pain.forms.slice(0, revealed || 1).map((f) => (
+              <div key={f.label} className="animate-fade-in-up rounded-lg bg-black/[0.03] p-2.5">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-slate)]">{f.label}</p>
+                <p className="text-sm text-[var(--color-ink)]">{f.text}</p>
+              </div>
+            ))}
+          </div>
+          {revealed < pain.forms.length && (
+            <button type="button" onClick={() => lab.revealNextHint(`practice-d-${chosen}`)} className="mt-2 w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2 text-xs font-bold text-[var(--color-accent)]">
+              Show the next form
+            </button>
+          )}
         </div>
       )}
     </LabCard>
@@ -169,22 +180,25 @@ function ModeD({ lab }: { lab: LabProgressApi }) {
 
 function ModeE({ lab }: { lab: LabProgressApi }) {
   const prompt = lab.state.selections["practice-e-prompt"] ?? "";
-  const format = lab.state.selections["practice-e-format"] ?? "Typed narration";
+  const item = interviewRehearsalPrompts.find((p) => p.prompt === prompt);
+  const revealed = !!lab.state.flags[`practice-e-${prompt}`];
   return (
     <LabCard>
-      <LabLabel>Format</LabLabel>
-      <PickOne options={["Silent whiteboard", "Typed narration"]} selKey="practice-e-format" lab={lab} />
-      <div className="mt-3">
-        <LabLabel>Prompt</LabLabel>
-        <PickOne options={interviewRehearsalPrompts} selKey="practice-e-prompt" lab={lab} />
-      </div>
-      {prompt && (
+      <LabLabel>Pick a prompt and think through your approach silently first</LabLabel>
+      <PickOne options={interviewRehearsalPrompts.map((p) => p.prompt)} selKey="practice-e-prompt" lab={lab} />
+      {item && (
         <div className="mt-3">
-          <NoteComposer
-            prompt={format === "Silent whiteboard" ? "Sketch your thinking in words — structure over prose" : "Narrate your full response as you would out loud"}
-            withLabel={false}
-            onSave={(text) => lab.addPractice("E", prompt, text)}
-          />
+          {!revealed ? (
+            <button type="button" onClick={() => lab.setFlag(`practice-e-${prompt}`)} className="w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2.5 text-xs font-bold text-[var(--color-accent)]">
+              Compare with one possible outline
+            </button>
+          ) : (
+            <ul className="animate-fade-in-up space-y-1 rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-xs text-[var(--color-ink)]">
+              {item.outline.map((o) => (
+                <li key={o}>• {o}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </LabCard>

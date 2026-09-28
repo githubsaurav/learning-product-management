@@ -95,12 +95,62 @@ export const prioritizationDimensions = [
   { key: "confidence", label: "Evidence confidence", description: "How confident are we that the problem and proposed causal chain are real?" },
 ];
 
+export const candidateOpportunities = [
+  { id: "coord", text: "Working customers need a dependable way to coordinate item handoff during pickup.", reach: "High — affects nearly every pickup, not just failed ones." },
+  { id: "packaging", text: "Customers need clear, item-specific guidance on whether original packaging is required.", reach: "Medium — affects returns where the box was discarded." },
+  { id: "refund", text: "Customers need visibility into when a refund will actually land.", reach: "Medium — affects the waiting period after any return." },
+  { id: "discovery", text: "Customers need an easier way to discover a defect before the return window closes.", reach: "Lower — a real but less frequent moment in this journey." },
+];
+
+export const priorityRationale =
+  "Pickup coordination affects the widest share of returns, sits at a moment of truth (a failed pickup restarts the whole recovery), and connects to nearly every downstream frustration in Rahul's story — the other three are real, but narrower or later in the journey.";
+
 export const interventionCategories = [
-  { key: "remove", label: "Remove", detail: "Eliminate a step, ambiguity, or dependency.", example: "Do not require synchronous calls for standard handoffs." },
-  { key: "enable", label: "Enable", detail: "Give the user greater control or capability.", example: "Let users declare short unavailable periods." },
-  { key: "inform", label: "Inform", detail: "Set accurate expectations at the right moment.", example: "Explain packaging requirements using the actual item category." },
-  { key: "coordinate", label: "Coordinate", detail: "Preserve context across people or channels.", example: "Carry return instructions and customer notes to the courier." },
-  { key: "recover", label: "Recover", detail: "Make failure easier to repair.", example: "Reschedule a failed attempt without making the user contact support." },
+  {
+    key: "remove",
+    label: "Remove",
+    detail: "Eliminate a step, ambiguity, or dependency.",
+    options: [
+      { id: "strong", text: "Do not require synchronous calls for standard handoffs.", strongest: true, note: "Removes the exact dependency that caused the failed pickup." },
+      { id: "weak", text: "Remove the return-approval screen entirely.", note: "This removes a step that wasn't actually the problem — approval already took two minutes." },
+    ],
+  },
+  {
+    key: "enable",
+    label: "Enable",
+    detail: "Give the user greater control or capability.",
+    options: [
+      { id: "strong", text: "Let users declare short unavailable periods.", strongest: true, note: "Gives Rahul a way to prevent the exact failure that happened to him." },
+      { id: "weak", text: "Let users pick the courier company.", note: "Doesn't address the coordination problem — any courier could still call at a bad time." },
+    ],
+  },
+  {
+    key: "inform",
+    label: "Inform",
+    detail: "Set accurate expectations at the right moment.",
+    options: [
+      { id: "strong", text: "Explain packaging requirements using the actual item category.", strongest: true, note: "Directly resolves the “instructions disagree” friction Rahul hit." },
+      { id: "weak", text: "Send a generic “thank you for your return” email.", note: "Friendly, but doesn't resolve any specific uncertainty Rahul had." },
+    ],
+  },
+  {
+    key: "coordinate",
+    label: "Coordinate",
+    detail: "Preserve context across people or channels.",
+    options: [
+      { id: "strong", text: "Carry return instructions and customer notes to the courier.", strongest: true, note: "Prevents Rahul from repeating his situation to support." },
+      { id: "weak", text: "Ask the customer to call the courier directly.", note: "This pushes the coordination burden back onto Rahul instead of removing it." },
+    ],
+  },
+  {
+    key: "recover",
+    label: "Recover",
+    detail: "Make failure easier to repair.",
+    options: [
+      { id: "strong", text: "Reschedule a failed attempt without making the user contact support.", strongest: true, note: "Directly shortens the exact recovery path Rahul was forced through." },
+      { id: "weak", text: "Offer a discount coupon after a failed pickup.", note: "Doesn't fix the underlying coordination problem — just softens the frustration." },
+    ],
+  },
 ];
 
 export const secondOrderQuestions = [
@@ -118,6 +168,16 @@ export const metricLevels = [
     example: "Successful first pickup attempt; fewer support contacts per return; lower time spent in uncertain status; shorter time to replacement purchase; reduced abandonment of a return after approval.",
   },
   { level: "Business outcome", question: "What organizational result may follow?", example: "Lower support and reverse-logistics cost; preserved repurchase rate; improved category trust; reduced refund-related escalation." },
+];
+
+/** Shuffled metric candidates for the three-column sort — correctColumn indexes metricLevels above. */
+export const metricSortItems = [
+  { text: "Fewer support contacts per return", correctColumn: 1 },
+  { text: "Regain money and purchase confidence with minimal coordination burden", correctColumn: 0 },
+  { text: "Lower support and reverse-logistics cost", correctColumn: 2 },
+  { text: "Successful first pickup attempt", correctColumn: 1 },
+  { text: "Improved category trust", correctColumn: 2 },
+  { text: "Feel that the return process respected his time", correctColumn: 0 },
 ];
 
 export const activationTeaching = {

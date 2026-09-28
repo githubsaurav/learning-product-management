@@ -1,13 +1,14 @@
+import { useState } from "react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
-import { NoteComposer } from "@/lab/components/NoteComposer";
-import { ExpertOverlay } from "@/lab/components/ExpertOverlay";
-import { ArtifactCard } from "@/lab/components/ArtifactCard";
+import { SelectChips } from "@/lab/components/SelectChips";
+import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
+import { OrderableList } from "@/lab/components/OrderableList";
+import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
-import { interviewOutlineArtifact } from "@/lab/data/artifacts";
 import { module5Reading } from "@/lab/data/readingRoom";
 import {
   interviewPrompt,
@@ -15,12 +16,12 @@ import {
   interviewerAnswers,
   actorSegments,
   defensibleActor,
-  goalContrast,
+  goalOptions,
   journeyStages5,
   possibleProblems,
   defensiblePriority,
   solutionDirections,
-  chainExample,
+  chainSegments,
   northStar,
   candidateIndicators,
   guardrails5,
@@ -31,10 +32,10 @@ import {
   listeningFor,
   failureModes,
   playbackHeadings,
+  playbackSortItems,
 } from "@/lab/data/module5";
 
 const TOTAL = 13;
-const CASE_LABEL = "Module 5 · Google Maps group trip";
 
 export function Module5({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m5");
@@ -54,7 +55,7 @@ export function Module5({ lab }: { lab: LabProgressApi }) {
       {section === 10 && <SceneAdaptation lab={lab} />}
       {section === 11 && <SceneReference />}
       {section === 12 && <ScenePlayback lab={lab} />}
-      {section === 13 && <SceneArtifact lab={lab} />}
+      {section === 13 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -69,21 +70,14 @@ export function Module5({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneClarify({ lab }: { lab: LabProgressApi }) {
-  const answered = lab.state.notebook.some((n) => n.moduleId === "m5" && n.kind === "question");
+  const selected = lab.state.multi["m5-clarify"] ?? [];
   return (
     <LabCard>
       <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Interview case</p>
       <p className="mt-1 text-sm font-bold text-[var(--color-ink)]">{interviewPrompt}</p>
-      <LabLabel>Areas worth clarifying</LabLabel>
-      <ul className="space-y-0.5 text-xs text-[var(--color-slate)]">
-        {clarifyAreas.map((a) => (
-          <li key={a}>• {a}</li>
-        ))}
-      </ul>
-      <div className="mt-3">
-        <NoteComposer prompt="Write two or three clarifying questions" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "question", text)} />
-      </div>
-      {answered && (
+      <LabLabel>Pick up to two questions you'd actually ask</LabLabel>
+      <SelectChips options={clarifyAreas} selected={selected} onToggle={(o) => lab.toggleMulti("m5-clarify", o)} max={2} />
+      {selected.length > 0 && (
         <div className="mt-3 animate-fade-in-up rounded-xl bg-[var(--color-accent-2-soft)] p-3">
           <p className="text-xs font-bold text-[var(--color-ink)]">The interviewer answers:</p>
           <ul className="mt-1 space-y-0.5 text-xs text-[var(--color-ink)]">
@@ -116,10 +110,7 @@ function SceneActor({ lab }: { lab: LabProgressApi }) {
         ))}
       </div>
       <p className="mt-2 text-xs italic text-[var(--color-slate)]">Which differences actually change the journey, needs, or product opportunity?</p>
-      <div className="mt-2">
-        <NoteComposer prompt="Explain why you chose this actor" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
-      </div>
-      {chosen && <p className="mt-3 rounded-xl bg-black/[0.03] p-3 text-xs text-[var(--color-ink)]">A possible defensible choice: {defensibleActor}</p>}
+      {chosen && <p className="mt-3 animate-fade-in-up rounded-xl bg-black/[0.03] p-3 text-xs text-[var(--color-ink)]">A possible defensible choice: {defensibleActor}</p>}
     </LabCard>
   );
 }
@@ -128,16 +119,8 @@ function SceneGoal({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">State the goal without using the product</h2>
-      <p className="mt-2 text-xs text-[var(--color-ink)]">
-        <span className="font-bold text-[var(--color-danger)]">Weak: </span>
-        {goalContrast.weak}
-      </p>
-      <p className="mt-1 text-xs text-[var(--color-ink)]">
-        <span className="font-bold text-[var(--color-success)]">Stronger: </span>
-        {goalContrast.strong}
-      </p>
-      <div className="mt-3">
-        <NoteComposer prompt="Write the goal in your own words, with the product name removed" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
+      <div className="mt-2">
+        <ChoiceReveal options={goalOptions} selected={lab.state.selections["m5-goal"] ?? null} onSelect={(id) => lab.setSelection("m5-goal", id)} />
       </div>
     </LabCard>
   );
@@ -147,20 +130,16 @@ function SceneJourney({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Narrate the current journey</h2>
-      <div className="mt-2 space-y-2">
+      <div className="mt-2 space-y-4">
         {journeyStages5.map((s, i) => (
-          <div key={s.name} className="rounded-xl border border-[var(--color-border)] p-3">
+          <div key={s.name}>
             <p className="text-sm font-bold text-[var(--color-ink)]">
               {i + 1}. {s.name}
             </p>
             <p className="text-xs text-[var(--color-slate)]">{s.detail}</p>
-            <textarea
-              value={lab.state.freeText[`m5-stage-${i}`] ?? ""}
-              onChange={(e) => lab.setFreeText(`m5-stage-${i}`, e.target.value)}
-              rows={1}
-              placeholder="Actions, questions, tools/channels, friction, emotion…"
-              className="mt-2 w-full resize-none rounded-lg border border-[var(--color-border)] p-2 text-xs text-[var(--color-ink)] outline-none focus-visible:border-[var(--color-accent)]"
-            />
+            <div className="mt-1.5">
+              <ChoiceReveal options={s.options} selected={lab.state.selections[`m5-stage-${i}`] ?? null} onSelect={(id) => lab.setSelection(`m5-stage-${i}`, id)} />
+            </div>
           </div>
         ))}
       </div>
@@ -169,40 +148,53 @@ function SceneJourney({ lab }: { lab: LabProgressApi }) {
 }
 
 function SceneProblems({ lab }: { lab: LabProgressApi }) {
+  const selected = lab.state.multi["m5-problems"] ?? [];
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Identify problems without solution language</h2>
-      <ul className="mt-2 space-y-0.5 text-xs text-[var(--color-slate)]">
-        {possibleProblems.map((p) => (
-          <li key={p}>• {p}</li>
-        ))}
-      </ul>
-      <p className="mt-2 text-xs italic text-[var(--color-ink)]">Phrase at least three problems as obstacles or unmet needs, not features.</p>
-      <div className="mt-3 space-y-2">
-        {[0, 1, 2].map((i) => (
-          <NoteComposer key={i} withLabel={false} placeholder={`Problem ${i + 1}…`} onSave={(text) => lab.addNote("m5", CASE_LABEL, "pain-point", text)} />
-        ))}
-      </div>
+      <LabLabel>Pick up to three you'd raise as real problems</LabLabel>
+      <SelectChips options={possibleProblems} selected={selected} onToggle={(o) => lab.toggleMulti("m5-problems", o)} max={3} />
+      {selected.length > 0 && <p className="mt-3 animate-fade-in-up text-xs italic text-[var(--color-ink)]">Each of these describes an obstacle or unmet need — notice none of them names a feature.</p>}
     </LabCard>
   );
 }
 
 function ScenePriority({ lab }: { lab: LabProgressApi }) {
+  const chosenProblems = lab.state.multi["m5-problems"]?.length ? lab.state.multi["m5-problems"] : possibleProblems.slice(0, 3);
+  const order = lab.state.multi["m5-priority-order"]?.length ? lab.state.multi["m5-priority-order"] : chosenProblems;
+  const items = order.map((text, i) => ({ id: `${i}-${text}`, text }));
+  const revealed = !!lab.state.flags["m5-priority-revealed"];
+
+  function move(id: string, dir: -1 | 1) {
+    const idx = items.findIndex((it) => it.id === id);
+    const next = [...order];
+    const swapWith = idx + dir;
+    if (swapWith < 0 || swapWith >= next.length) return;
+    [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
+    lab.setMulti("m5-priority-order", next);
+  }
+
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Prioritize transparently</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Compare using: severity for the actor, frequency, effect on the group goal, fit with Maps' strengths, confidence in assumptions.</p>
-      <div className="mt-3">
-        <NoteComposer prompt="Which problem would you prioritize, and why?" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Reorder your chosen problems from most to least worth solving first.</p>
+      <div className="mt-2">
+        <OrderableList items={items} onMove={move} />
       </div>
-      <p className="mt-3 rounded-xl bg-black/[0.03] p-3 text-xs text-[var(--color-ink)]">A defensible priority: {defensiblePriority}</p>
-      <p className="mt-2 text-xs italic text-[var(--color-slate)]">Notice the uncertainty is said aloud — good reasoning doesn't pretend assumptions are facts.</p>
+      {!revealed ? (
+        <button type="button" onClick={() => lab.setFlag("m5-priority-revealed")} className="mt-3 w-full rounded-xl border-2 border-dashed border-[var(--color-accent)] py-2.5 text-xs font-bold text-[var(--color-accent)] hover:bg-[var(--color-accent-soft)]">
+          Compare with a defensible priority
+        </button>
+      ) : (
+        <p className="mt-3 animate-fade-in-up rounded-xl bg-[var(--color-accent-2-soft)] p-3 text-xs text-[var(--color-ink)]">{defensiblePriority}</p>
+      )}
     </LabCard>
   );
 }
 
 function SceneDirections({ lab }: { lab: LabProgressApi }) {
   const chosen = lab.state.selections["m5-direction"] ?? "";
+  const direction = solutionDirections.find((d) => d.id === chosen);
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Explore solution directions</h2>
@@ -221,70 +213,74 @@ function SceneDirections({ lab }: { lab: LabProgressApi }) {
           </button>
         ))}
       </div>
-      <div className="mt-3">
-        <NoteComposer prompt="Explain the minimum valuable behavior of your chosen direction (not an entire platform)" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
-      </div>
+      {direction && <p className="mt-3 animate-fade-in-up rounded-xl bg-black/[0.03] p-3 text-xs text-[var(--color-ink)]">{direction.minimal}</p>}
     </LabCard>
   );
 }
 
 function SceneChain({ lab }: { lab: LabProgressApi }) {
+  const shuffled = [chainSegments[2], chainSegments[0], chainSegments[4], chainSegments[1], chainSegments[3]];
+  const order = lab.state.multi["m5-chain-order"]?.length ? lab.state.multi["m5-chain-order"] : shuffled;
+  const items = order.map((text, i) => ({ id: `${i}-${text.slice(0, 8)}`, text }));
+  const [checked, setChecked] = useState(false);
+  const isCorrect = order.join("|") === chainSegments.join("|");
+
+  function move(id: string, dir: -1 | 1) {
+    const idx = items.findIndex((it) => it.id === id);
+    const next = [...order];
+    const swapWith = idx + dir;
+    if (swapWith < 0 || swapWith >= next.length) return;
+    [next[idx], next[swapWith]] = [next[swapWith], next[idx]];
+    lab.setMulti("m5-chain-order", next);
+  }
+
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Connect solution to journey and risk</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">Evidence/problem → intended behavior change → expected user outcome → metric → risk</p>
-      <p className="mt-2 rounded-xl bg-black/[0.03] p-3 text-xs text-[var(--color-ink)]">{chainExample}</p>
-      <div className="mt-3">
-        <NoteComposer prompt="Write your own chain for your selected direction" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
+      <p className="mt-1 text-xs text-[var(--color-slate)]">Reorder these five links into: evidence/problem → behavior change → user outcome → metric → risk.</p>
+      <div className="mt-2">
+        <OrderableList items={items} onMove={move} />
       </div>
+      {!checked ? (
+        <button type="button" onClick={() => setChecked(true)} className="mt-3 w-full rounded-xl bg-[var(--color-ink)] py-2.5 text-xs font-bold text-white">
+          Check my chain
+        </button>
+      ) : (
+        <p className={`mt-3 animate-fade-in-up rounded-xl p-3 text-xs ${isCorrect ? "bg-[var(--color-success-soft)] text-[var(--color-ink)]" : "bg-[var(--color-danger-soft)] text-[var(--color-ink)]"}`}>
+          {isCorrect ? "That's the intended chain." : "Not quite the intended order — correct chain:"} {!isCorrect && chainSegments.join(" → ")}
+        </p>
+      )}
     </LabCard>
   );
 }
 
 function SceneSuccess({ lab }: { lab: LabProgressApi }) {
+  const indicators = lab.state.multi["m5-indicators"] ?? [];
+  const guardrailsPicked = lab.state.multi["m5-guardrails"] ?? [];
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Define success</h2>
       <p className="mt-2 text-xs font-bold text-[var(--color-ink)]">North-star user outcome</p>
       <p className="text-xs text-[var(--color-slate)]">{northStar}</p>
-      <p className="mt-2 text-xs font-bold text-[var(--color-ink)]">Candidate behavioral indicators</p>
-      <ul className="space-y-0.5 text-xs text-[var(--color-slate)]">
-        {candidateIndicators.map((c) => (
-          <li key={c}>• {c}</li>
-        ))}
-      </ul>
-      <p className="mt-2 text-xs font-bold text-[var(--color-ink)]">Guardrails</p>
-      <ul className="space-y-0.5 text-xs text-[var(--color-slate)]">
-        {guardrails5.map((g) => (
-          <li key={g}>• {g}</li>
-        ))}
-      </ul>
+      <LabLabel>Pick the behavioral indicators you'd actually present (up to 3)</LabLabel>
+      <SelectChips options={candidateIndicators} selected={indicators} onToggle={(o) => lab.toggleMulti("m5-indicators", o)} max={3} />
       <div className="mt-3">
-        <NoteComposer prompt="Pick the metrics and guardrails you'd actually present" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "metric", text)} />
+        <LabLabel>Pick the guardrails you'd name (up to 3)</LabLabel>
+        <SelectChips options={guardrails5} selected={guardrailsPicked} onToggle={(o) => lab.toggleMulti("m5-guardrails", o)} max={3} />
       </div>
     </LabCard>
   );
 }
 
 function SceneAdaptation({ lab }: { lab: LabProgressApi }) {
-  const revealed = !!lab.state.overlays["m5-adaptation"];
+  const picked = lab.state.multi["m5-adaptation"] ?? [];
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Adaptation challenge</h2>
       <p className="mt-2 rounded-xl bg-[var(--color-danger-soft)] p-3 text-sm text-[var(--color-ink)]">New constraint: {adaptationConstraint}</p>
-      <div className="mt-3">
-        <NoteComposer prompt="Revise your solution while keeping the prioritized need stable" withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", text)} />
-      </div>
-      <div className="mt-3">
-        <ExpertOverlay revealed={revealed} onReveal={() => lab.revealOverlay("m5-adaptation")} buttonLabel="See possible adaptations">
-          <ul className="space-y-1 text-sm text-[var(--color-ink)]">
-            {possibleAdaptations.map((a) => (
-              <li key={a}>• {a}</li>
-            ))}
-          </ul>
-        </ExpertOverlay>
-      </div>
-      <p className="mt-2 text-xs italic text-[var(--color-slate)]">Strong product thinking preserves the problem understanding while allowing the solution to change.</p>
+      <LabLabel>Which adaptations would you apply, keeping the prioritized need stable?</LabLabel>
+      <SelectChips options={possibleAdaptations} selected={picked} onToggle={(o) => lab.toggleMulti("m5-adaptation", o)} />
+      {picked.length > 0 && <p className="mt-3 animate-fade-in-up text-xs italic text-[var(--color-slate)]">Strong product thinking preserves the problem understanding while allowing the solution to change.</p>}
     </LabCard>
   );
 }
@@ -340,24 +336,53 @@ function SceneReference() {
 }
 
 function ScenePlayback({ lab }: { lab: LabProgressApi }) {
+  const items = playbackSortItems.map((it, i) => ({ id: `pb-${i}`, text: it.text, correctColumn: it.correctColumn }));
+  const assignments: Record<string, number | undefined> = {};
+  for (const it of items) {
+    const v = lab.state.selections[`m5-playback-${it.id}`];
+    if (v !== undefined) assignments[it.id] = Number(v);
+  }
   return (
     <LabCard>
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Interview playback</h2>
-      <p className="mt-1 text-xs text-[var(--color-slate)]">No score — sort your own reasoning under these four headings.</p>
-      <div className="mt-3 space-y-3">
-        {playbackHeadings.map((h) => (
-          <NoteComposer key={h} prompt={h} withLabel={false} onSave={(text) => lab.addNote("m5", CASE_LABEL, "note", `[${h}] ${text}`)} />
-        ))}
+      <p className="mt-1 text-xs text-[var(--color-slate)]">No score — sort these example candidate moments under the heading each one fits.</p>
+      <div className="mt-3">
+        <EvidenceBoard columns={playbackHeadings} items={items} assignments={assignments} checkable onAssign={(id, col) => lab.setSelection(`m5-playback-${id}`, String(col))} />
       </div>
     </LabCard>
   );
 }
 
-function SceneArtifact({ lab }: { lab: LabProgressApi }) {
-  const values = lab.state.artifacts[interviewOutlineArtifact.id] ?? {};
+function SceneRecap({ lab }: { lab: LabProgressApi }) {
+  const actor = lab.state.selections["m5-actor"];
+  const direction = solutionDirections.find((d) => d.id === lab.state.selections["m5-direction"]);
+  const topProblem = (lab.state.multi["m5-priority-order"] ?? lab.state.multi["m5-problems"] ?? [])[0];
   return (
     <div className="space-y-4">
-      <ArtifactCard def={interviewOutlineArtifact} values={values} onChange={(k, v) => lab.setArtifactField(interviewOutlineArtifact.id, k, v)} />
+      <LabCard>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Interview Case Storyboard</p>
+        <ul className="mt-2 space-y-1.5 text-sm text-[var(--color-ink)]">
+          {actor && (
+            <li>
+              <span className="font-bold">Actor: </span>
+              {actor}
+            </li>
+          )}
+          {topProblem && (
+            <li>
+              <span className="font-bold">Top problem: </span>
+              {topProblem}
+            </li>
+          )}
+          {direction && (
+            <li>
+              <span className="font-bold">Direction: </span>
+              {direction.title}
+            </li>
+          )}
+        </ul>
+        <p className="mt-2 text-xs text-[var(--color-slate)]">This storyboard is assembled from the choices, rankings, and sorts you made throughout the module.</p>
+      </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>
         <div className="mt-2">
