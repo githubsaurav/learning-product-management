@@ -2,11 +2,11 @@ export const meeraIntro =
   "Meera has a 7:45 a.m. flight from Bengaluru. It is raining. The apartment security gate is slow to open, the airline has warned passengers to arrive early, and Meera is carrying a suitcase and a laptop bag. She has not opened a mobility app yet.";
 
 export const beginningTicks = [
-  { position: 5, label: "Booked the flight", icon: "🎫" },
-  { position: 28, label: "Planned when to leave", icon: "🕐" },
-  { position: 52, label: "Opened Uber/Ola", icon: "📱" },
-  { position: 75, label: "Driver accepted", icon: "🚗" },
-  { position: 95, label: "Car arrived", icon: "📍" },
+  { position: 5, label: "Booked the flight" },
+  { position: 28, label: "Planned when to leave" },
+  { position: 52, label: "Opened Uber/Ola" },
+  { position: 75, label: "Driver accepted" },
+  { position: 95, label: "Car arrived" },
 ];
 
 /** Shown at the top (objective) and bottom (learned + common mistake) of each of the
@@ -87,19 +87,16 @@ export const teams = [
   {
     id: "pickup",
     name: "Pickup team",
-    icon: "📦",
     charter: "Reduce failed or stressful pickups.",
   },
   {
     id: "airport",
     name: "Airport partnerships team",
-    icon: "✈️",
     charter: "Make airport travel predictable from planning through terminal arrival.",
   },
   {
     id: "payments",
     name: "Payments team",
-    icon: "💳",
     charter: "Reduce confusion about fares, tolls, and receipts.",
   },
 ];
@@ -126,7 +123,6 @@ export const framingEditEffects = [
 export interface CameraLens {
   id: string;
   name: string;
-  icon: string;
   question: string;
   contains: string;
   example: string;
@@ -137,7 +133,6 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "journey",
     name: "User journey",
-    icon: "🗺️",
     question: "“A scenario-based sequence of the steps that a user takes in order to accomplish a high-level goal with a company or product, usually across channels and over time.”",
     contains: "Stages, actions, thoughts, emotions, needs, touchpoints, channels, pain points, context.",
     example: "Meera getting from home to her airport terminal.",
@@ -146,7 +141,6 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "flow",
     name: "User flow",
-    icon: "🔀",
     question: "“A set of interactions that describe the typical or ideal set of steps needed to accomplish a common task performed with a product.”",
     contains: "Screens, actions, decisions, system responses, alternate paths.",
     example: "Selecting pickup and destination, choosing a ride type, and confirming the booking.",
@@ -155,7 +149,6 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "funnel",
     name: "Funnel",
-    icon: "📉",
     question: "A quantitative representation of where people progress or drop out across measurable, event-defined steps.",
     contains: "Population counts, conversion rates, stages defined by events.",
     example: "Search initiated → ride option viewed → booking requested → ride completed.",
@@ -163,7 +156,6 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "lifecycle",
     name: "Lifecycle",
-    icon: "🔁",
     question: "The evolution of a person's relationship with a product or company over time.",
     contains: "Acquisition, activation, engagement, retention, expansion, churn, or reactivation.",
     example: "First ride through becoming a recurring commuter.",
@@ -171,7 +163,6 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "blueprint",
     name: "Service blueprint",
-    icon: "🏗️",
     question: "“A visualization of the relationships between different service components — people, props (physical or digital evidence), and processes — that are directly tied to touchpoints in a specific customer journey.”",
     contains: "Customer actions, visible service, backstage activity, support processes, dependencies.",
     example: "Dispatch logic, driver incentives, mapping systems, airport queues, customer support, and payment settlement behind Meera's ride.",

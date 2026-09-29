@@ -1,4 +1,3 @@
-import { Clock, Users, Building2, PenLine, Briefcase, Camera, AlertTriangle, Brain, Shuffle, FileCheck2 } from "lucide-react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
@@ -35,15 +34,8 @@ import {
 
 const TOTAL = 10;
 
-function SceneHeading({ icon: Icon, children }: { icon: typeof Clock; children: string }) {
-  return (
-    <div className="flex items-center gap-2">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-soft)] text-[var(--color-accent)]">
-        <Icon size={16} />
-      </span>
-      <h2 className="text-base font-bold text-[var(--color-ink)]">{children}</h2>
-    </div>
-  );
+function SceneHeading({ children }: { children: string }) {
+  return <h2 className="text-base font-bold text-[var(--color-ink)]">{children}</h2>;
 }
 
 export function Module1({ lab }: { lab: LabProgressApi }) {
@@ -83,7 +75,7 @@ function SceneBeginning({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Clock}>Where does the journey begin?</SceneHeading>
+      <SceneHeading>Where does the journey begin?</SceneHeading>
       <p className="mt-2 text-base leading-relaxed text-[var(--color-ink)]">{meeraIntro}</p>
       <p className="mt-3 rounded-xl bg-black/[0.03] p-3 text-base font-bold text-[var(--color-ink)]">Has Meera's airport journey started?</p>
       <div className="mt-3">
@@ -109,7 +101,7 @@ function SceneParticipant({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Users}>The app is only one participant</SceneHeading>
+      <SceneHeading>The app is only one participant</SceneHeading>
       <p className="mt-1 text-sm text-[var(--color-slate)]">Tap everything you think happens outside the ride app, then check your picks.</p>
       <ol className="mt-3 space-y-1.5">
         {sequenceSteps.map((step, i) => {
@@ -168,7 +160,7 @@ function SceneThreeTeams({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Building2}>Three teams, three legitimate scopes</SceneHeading>
+      <SceneHeading>Three teams, three legitimate scopes</SceneHeading>
       <p className="mt-1 text-sm text-[var(--color-slate)]">Give the same timeline a different start and end boundary for each team, and watch the shaded scope bar change.</p>
       <div className="mt-3 space-y-5">
         {teams.map((team) => {
@@ -176,10 +168,7 @@ function SceneThreeTeams({ lab }: { lab: LabProgressApi }) {
           const end = lab.state.timeline[`m1-${team.id}-end`] ?? 80;
           return (
             <div key={team.id} className="rounded-xl border border-[var(--color-border)] p-3.5">
-              <p className="text-sm font-bold text-[var(--color-ink)]">
-                <span className="mr-1">{team.icon}</span>
-                {team.name}
-              </p>
+              <p className="text-sm font-bold text-[var(--color-ink)]">{team.name}</p>
               <p className="text-sm text-[var(--color-slate)]">{team.charter}</p>
               <div className="mt-2 space-y-3">
                 <div>
@@ -213,7 +202,7 @@ function SceneFraming({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={PenLine}>The five framing decisions</SceneHeading>
+      <SceneHeading>The five framing decisions</SceneHeading>
       <ul className="mt-2 space-y-1.5">
         {framingDecisions.map((d) => (
           <li key={d.key} className="text-base text-[var(--color-ink)]">
@@ -244,20 +233,18 @@ function SceneCamera({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Camera}>Similar tools, different questions</SceneHeading>
+      <SceneHeading>Similar tools, different questions</SceneHeading>
       <p className="mt-1 text-sm text-[var(--color-slate)]">Zoom the camera from “life” to “organization” over the same airport case.</p>
       <input type="range" min={0} max={100} value={zoom} onChange={(e) => lab.setTimeline("m1-zoom", Number(e.target.value))} className="mt-3 h-2 w-full accent-[var(--color-accent)]" aria-label="Camera zoom" />
       <div className="mt-1 flex justify-between text-xs text-[var(--color-slate)]">
         {cameraLenses.map((l) => (
           <span key={l.id} className={l.id === lens.id ? "font-bold text-[var(--color-accent)]" : ""}>
-            {l.icon} {l.name}
+            {l.name}
           </span>
         ))}
       </div>
       <div className="mt-4 rounded-xl border border-[var(--color-accent)]/25 bg-[var(--color-accent-soft)] p-3.5">
-        <p className="text-base font-bold text-[var(--color-ink)]">
-          {lens.icon} {lens.name}
-        </p>
+        <p className="text-base font-bold text-[var(--color-ink)]">{lens.name}</p>
         <p className="mt-1 text-sm text-[var(--color-ink)]">
           <span className="font-bold">Definition: </span>
           {lens.question}
@@ -288,7 +275,7 @@ function SceneJTBD({ lab }: { lab: LabProgressApi }) {
         <p>{jtbdExample}</p>
       </FrameworkBadge>
       <div className="mt-4">
-        <SceneHeading icon={Briefcase}>What is Meera really hiring the app to do?</SceneHeading>
+        <SceneHeading>What is Meera really hiring the app to do?</SceneHeading>
       </div>
       <div className="mt-2">
         <ChoiceReveal
@@ -310,7 +297,7 @@ function SceneTraps() {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={AlertTriangle}>Thinking traps</SceneHeading>
+      <SceneHeading>Thinking traps</SceneHeading>
       <div className="mt-2 space-y-2">
         {thinkingTraps.map((t) => (
           <div key={t.title} className="rounded-xl bg-[var(--color-danger-soft)] p-3.5">
@@ -329,7 +316,7 @@ function SceneReflection({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Brain}>Reflection canvas</SceneHeading>
+      <SceneHeading>Reflection canvas</SceneHeading>
       <p className="mt-1 text-sm text-[var(--color-slate)]">For each question, pick the option that best fits the evidence in the story.</p>
       <div className="mt-3 space-y-5">
         {reflectionQuestions.map((rq, i) => (
@@ -354,7 +341,7 @@ function SceneTransfer({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
       <SectionObjective>{copy.objective}</SectionObjective>
-      <SceneHeading icon={Shuffle}>Transfer studio</SceneHeading>
+      <SceneHeading>Transfer studio</SceneHeading>
       <p className="mt-1 text-sm text-[var(--color-slate)]">Choose a situation, then pick the stronger framing sentence for it.</p>
       <SelectChips options={transferPrompts} selected={chosen ? [chosen] : []} onToggle={(p) => lab.setSelection("m1-transfer", p)} />
       {framing && (
@@ -386,10 +373,7 @@ function SceneRecap({ lab }: { lab: LabProgressApi }) {
     <div className="space-y-4">
       <LabCard>
         <SectionObjective>{copy.objective}</SectionObjective>
-        <div className="flex items-center gap-2">
-          <FileCheck2 size={18} className="text-[var(--color-accent)]" />
-          <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Journey Frame</p>
-        </div>
+        <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Journey Frame</p>
         <p className="mt-2 text-base text-[var(--color-ink)]">
           You placed Meera's journey beginning around <span className="font-bold">{beginTick}</span>.
         </p>

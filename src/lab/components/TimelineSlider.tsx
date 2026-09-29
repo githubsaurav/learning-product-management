@@ -1,9 +1,6 @@
-import { MapPin } from "lucide-react";
-
 export interface TimelineTick {
   position: number;
   label: string;
-  icon?: string;
 }
 
 /** A range slider that visibly responds as it moves: a pill above it always
@@ -23,11 +20,7 @@ export function TimelineSlider({
 
   return (
     <div className="py-2">
-      <div className="mb-2 flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-bold text-[var(--color-accent)] w-fit">
-        <MapPin size={13} />
-        {nearest.icon && <span>{nearest.icon}</span>}
-        {nearest.label}
-      </div>
+      <div className="mb-2 w-fit rounded-full bg-[var(--color-accent-soft)] px-3 py-1.5 text-xs font-bold text-[var(--color-accent)]">{nearest.label}</div>
       <input
         type="range"
         min={0}
@@ -37,7 +30,7 @@ export function TimelineSlider({
         aria-label={ariaLabel}
         className="h-2 w-full accent-[var(--color-accent)]"
       />
-      <div className="relative mt-2 h-12 text-xs text-[var(--color-slate)]">
+      <div className="relative mt-2 h-9 text-xs text-[var(--color-slate)]">
         {ticks.map((t) => {
           const isNear = t.label === nearest.label;
           return (
@@ -46,7 +39,6 @@ export function TimelineSlider({
               className={`absolute top-0 -translate-x-1/2 text-center leading-tight transition-colors ${isNear ? "font-bold text-[var(--color-accent)]" : ""}`}
               style={{ left: `${t.position}%`, width: 76 }}
             >
-              {t.icon && <span className="block text-sm">{t.icon}</span>}
               {t.label}
             </span>
           );
