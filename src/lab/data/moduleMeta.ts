@@ -1,5 +1,3 @@
-import type { TraceLetter } from "@/lab/types";
-
 export interface ModuleMeta {
   id: string;
   number: number;
@@ -7,7 +5,6 @@ export interface ModuleMeta {
   question: string;
   caseLabel: string;
   estimate: string;
-  trace: TraceLetter;
   artifact: string;
   sections: number;
   /** Real, named frameworks this module explicitly teaches, shown before diving in. */
@@ -22,7 +19,6 @@ export const moduleMetas: ModuleMeta[] = [
     question: "What exactly are we trying to understand?",
     caseLabel: "An airport ride using Uber/Ola",
     estimate: "35–50 minutes",
-    trace: "T",
     artifact: "Journey Frame Card",
     sections: 10,
     frameworks: ["Jobs to Be Done"],
@@ -34,7 +30,6 @@ export const moduleMetas: ModuleMeta[] = [
     question: "How do we learn what the journey actually is?",
     caseLabel: "A late-night food order using Swiggy/Zomato",
     estimate: "50–70 minutes",
-    trace: "R",
     artifact: "Evidence Board and Research Plan",
     sections: 11,
     frameworks: ["5-Step Journey Mapping Process (NN/g)"],
@@ -46,7 +41,6 @@ export const moduleMetas: ModuleMeta[] = [
     question: "How do we turn messy reality into a useful model?",
     caseLabel: "Booking and completing an Airbnb weekend",
     estimate: "55–75 minutes",
-    trace: "A",
     artifact: "Current-State Journey Map",
     sections: 8,
     frameworks: ["5 Components of a Journey Map (NN/g)"],
@@ -58,7 +52,6 @@ export const moduleMetas: ModuleMeta[] = [
     question: "Which moment deserves attention, and why?",
     caseLabel: "Returning an Amazon/Flipkart purchase",
     estimate: "55–75 minutes",
-    trace: "C",
     artifact: "Prioritized Opportunity Brief",
     sections: 10,
     frameworks: ["7 Journey-Map Lenses (NN/g)", "5 Whys", "Opportunity Solution Tree", "RICE / ICE"],
@@ -70,7 +63,6 @@ export const moduleMetas: ModuleMeta[] = [
     question: "How do we use journey thinking in an interview?",
     caseLabel: "Improve Google Maps for a group trip",
     estimate: "60–90 minutes",
-    trace: "E",
     artifact: "Interview-ready case response",
     sections: 14,
     frameworks: ["CIRCLES Method"],

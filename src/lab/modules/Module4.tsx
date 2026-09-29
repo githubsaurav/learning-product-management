@@ -39,7 +39,7 @@ export function Module4({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m4");
   return (
     <div className="space-y-4 pb-24">
-      <ModuleHeader eyebrow="Module 4 · Find the Leverage" question="Which moment deserves attention, and why?" section={section} totalSections={TOTAL} trace="C" />
+      <ModuleHeader eyebrow="Module 4 · Find the Leverage" question="Which moment deserves attention, and why?" section={section} totalSections={TOTAL} />
 
       {section === 1 && <SceneBoundary lab={lab} />}
       {section === 2 && <SceneLenses />}

@@ -53,7 +53,7 @@ export function Module5({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m5");
   return (
     <div className="space-y-4 pb-24">
-      <ModuleHeader eyebrow="Module 5 · Communicate the Thinking" question="How do we use journey thinking under interview pressure?" section={section} totalSections={TOTAL} trace="E" />
+      <ModuleHeader eyebrow="Module 5 · Communicate the Thinking" question="How do we use journey thinking under interview pressure?" section={section} totalSections={TOTAL} />
 
       {section === 1 && <SceneCircles />}
       {section === 2 && <SceneClarify lab={lab} />}

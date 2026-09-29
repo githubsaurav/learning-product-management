@@ -51,7 +51,7 @@ export function Module1({ lab }: { lab: LabProgressApi }) {
 
   return (
     <div className="space-y-4 pb-24">
-      <ModuleHeader eyebrow="Module 1 · See the Journey" question="What exactly are we trying to understand?" section={section} totalSections={TOTAL} trace="T" />
+      <ModuleHeader eyebrow="Module 1 · See the Journey" question="What exactly are we trying to understand?" section={section} totalSections={TOTAL} />
 
       {section === 1 && <SceneBeginning lab={lab} />}
       {section === 2 && <SceneParticipant lab={lab} />}

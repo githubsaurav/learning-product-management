@@ -76,11 +76,6 @@ started / in progress / model built, never a percentage), **Module 1–5**,
 Studio** (5 rehearsal modes) — plus a **Portfolio Capstone** that exports
 everything you built as Markdown.
 
-- **One TRACE roadmap throughout** (Target → Reconstruct → Arrange →
-  Concentrate → Evaluate) — this app's own organizing device, not a
-  published industry framework — shown as a small rail on every module
-  screen and labeled as such, highlighting the current letter rather than
-  re-teaching it each time.
 - **A framing sentence is a mad-lib, not a text box** — tap a blank, pick
   from 2–3 pre-written options, and watch a line explain what that choice
   changed (Module 1).
@@ -148,10 +143,11 @@ src/
   lab/
     state/useLabProgress.ts    one localStorage-backed store: generic selections/multi/timeline/hints/overlays/flags buckets, each keyed per-interaction — no free-text field
     state/useModuleSection.ts  tracks which section of a module is showing, persisted
-    components/            TraceRail, MadLibSentence, ChoiceReveal, RevealSteps,
+    components/            MadLibSentence, ChoiceReveal, RevealSteps,
                             SelectChips, BoundaryInserter, OrderableList,
                             EvidenceBoard (tap-to-assign, with an optional
-                            "check my placement" reveal), TimelineSlider, ExpertOverlay
+                            "check my placement" reveal), TimelineSlider, ExpertOverlay,
+                            SectionObjective/SectionTakeaway, FrameworkBadge
     data/                   module1.ts..module5.ts (case content + every option/
                             distractor the choice-based exercises use),
                             glossary.ts, readingRoom.ts, moduleMeta.ts, practiceStudio.ts

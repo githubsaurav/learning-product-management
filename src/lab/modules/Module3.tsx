@@ -21,7 +21,7 @@ export function Module3({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m3");
   return (
     <div className="space-y-4 pb-24">
-      <ModuleHeader eyebrow="Module 3 · Build the Map" question="How do we turn messy reality into a useful model?" section={section} totalSections={TOTAL} trace="A" />
+      <ModuleHeader eyebrow="Module 3 · Build the Map" question="How do we turn messy reality into a useful model?" section={section} totalSections={TOTAL} />
 
       {section === 1 && <SceneFragments lab={lab} />}
       {section === 2 && <SceneSpineAndStages lab={lab} />}
