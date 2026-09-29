@@ -46,7 +46,7 @@ export function StudioHome({ lab, onOpenModule }: { lab: LabProgressApi; onOpenM
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-[var(--color-slate)]">
                   <span className="rounded-full bg-black/[0.04] px-2 py-0.5">{m.estimate}</span>
-                  <span className="rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[var(--color-accent-2)]">TRACE: {m.trace}</span>
+                  <span className="rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[var(--color-accent-2)]">Roadmap step: {m.trace}</span>
                   <span className="rounded-full bg-black/[0.04] px-2 py-0.5">Builds: {m.artifact}</span>
                   <span className="ml-auto font-bold text-[var(--color-ink)]">{reachedRecap ? "Model built" : visited ? "In progress" : "Not started"}</span>
                 </div>

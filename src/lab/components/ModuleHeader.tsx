@@ -23,7 +23,10 @@ export function ModuleHeader({
           Section {section} of {totalSections}
         </p>
       </div>
-      <TraceRail active={trace} />
+      <div>
+        <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--color-slate)]">This course's roadmap — not an industry framework</p>
+        <TraceRail active={trace} />
+      </div>
     </div>
   );
 }

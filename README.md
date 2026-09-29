@@ -76,9 +76,11 @@ started / in progress / model built, never a percentage), **Module 1–5**,
 Studio** (5 rehearsal modes) — plus a **Portfolio Capstone** that exports
 everything you built as Markdown.
 
-- **One TRACE framework throughout** (Target → Reconstruct → Arrange →
-  Concentrate → Evaluate), shown as a small rail on every module screen,
-  highlighting the current letter rather than re-teaching it each time.
+- **One TRACE roadmap throughout** (Target → Reconstruct → Arrange →
+  Concentrate → Evaluate) — this app's own organizing device, not a
+  published industry framework — shown as a small rail on every module
+  screen and labeled as such, highlighting the current letter rather than
+  re-teaching it each time.
 - **A framing sentence is a mad-lib, not a text box** — tap a blank, pick
   from 2–3 pre-written options, and watch a line explain what that choice
   changed (Module 1).
