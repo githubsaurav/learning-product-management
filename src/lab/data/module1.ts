@@ -73,45 +73,60 @@ export interface CameraLens {
   question: string;
   contains: string;
   example: string;
+  source?: string;
 }
 
 export const cameraLenses: CameraLens[] = [
   {
     id: "journey",
     name: "User journey",
-    question: "How does a person pursue a meaningful goal across time and touchpoints?",
+    question: "“A scenario-based sequence of the steps that a user takes in order to accomplish a high-level goal with a company or product, usually across channels and over time.”",
     contains: "Stages, actions, thoughts, emotions, needs, touchpoints, channels, pain points, context.",
     example: "Meera getting from home to her airport terminal.",
+    source: "Nielsen Norman Group, “User Journeys vs. User Flows”",
   },
   {
     id: "flow",
     name: "User flow",
-    question: "What interactions occur inside a product while completing a specific task?",
+    question: "“A set of interactions that describe the typical or ideal set of steps needed to accomplish a common task performed with a product.”",
     contains: "Screens, actions, decisions, system responses, alternate paths.",
     example: "Selecting pickup and destination, choosing a ride type, and confirming the booking.",
+    source: "Nielsen Norman Group, “User Journeys vs. User Flows”",
   },
   {
     id: "funnel",
     name: "Funnel",
-    question: "Where do people progress or drop out across measurable steps?",
+    question: "A quantitative representation of where people progress or drop out across measurable, event-defined steps.",
     contains: "Population counts, conversion rates, stages defined by events.",
     example: "Search initiated → ride option viewed → booking requested → ride completed.",
   },
   {
     id: "lifecycle",
     name: "Lifecycle",
-    question: "How does a person's relationship with a product or company evolve?",
+    question: "The evolution of a person's relationship with a product or company over time.",
     contains: "Acquisition, activation, engagement, retention, expansion, churn, or reactivation.",
     example: "First ride through becoming a recurring commuter.",
   },
   {
     id: "blueprint",
     name: "Service blueprint",
-    question: "What frontstage and backstage people, processes, policies, and systems deliver the experience?",
+    question: "“A visualization of the relationships between different service components — people, props (physical or digital evidence), and processes — that are directly tied to touchpoints in a specific customer journey.”",
     contains: "Customer actions, visible service, backstage activity, support processes, dependencies.",
     example: "Dispatch logic, driver incentives, mapping systems, airport queues, customer support, and payment settlement behind Meera's ride.",
+    source: "Nielsen Norman Group, “UX Mapping Methods Compared”",
   },
 ];
+
+export const jtbdQuote =
+  "“When people find themselves needing to get a job done, they essentially hire products to do that job for them.” — Clayton Christensen, Harvard Business School";
+
+export const jtbdExample = "People don't buy a drill because they want a drill — they buy it because they need a hole in the wall. The drill is hired to do a job.";
+
+export const jtbdChoice = {
+  weak: "Meera hires a ride-hailing app to get her a ride.",
+  strong: "Meera hires a ride-hailing app to get her to the correct terminal with enough time and confidence, even when the morning is uncertain.",
+  note: "The weak version restates the product. The strong version names the actual “job” Meera is hiring it to do — exactly what Jobs to Be Done asks you to find.",
+};
 
 export const thinkingTraps = [
   { title: "Trap 1 — Beginning at sign-up", detail: "The need often begins before the product interaction." },

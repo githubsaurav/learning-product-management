@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { ModuleHeader } from "@/lab/components/ModuleHeader";
 import { ContinueButton } from "@/lab/components/ContinueButton";
 import { LabCard, LabLabel } from "@/lab/components/Card";
@@ -7,10 +8,12 @@ import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { OrderableList } from "@/lab/components/OrderableList";
 import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ReadingList } from "@/lab/components/ReadingList";
+import { FrameworkBadge } from "@/lab/components/FrameworkBadge";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
 import { module5Reading } from "@/lab/data/readingRoom";
 import {
+  circlesSteps,
   interviewPrompt,
   clarifyAreas,
   interviewerAnswers,
@@ -35,7 +38,16 @@ import {
   playbackSortItems,
 } from "@/lab/data/module5";
 
-const TOTAL = 13;
+const TOTAL = 14;
+
+function CircleTag({ letter, name }: { letter: string; name: string }) {
+  return (
+    <p className="mb-1.5 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wide text-[var(--color-accent)]">
+      <span className="flex h-4 w-4 items-center justify-center rounded bg-[var(--color-accent)] text-white">{letter}</span>
+      {name}
+    </p>
+  );
+}
 
 export function Module5({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m5");
@@ -43,19 +55,20 @@ export function Module5({ lab }: { lab: LabProgressApi }) {
     <div className="space-y-4 pb-24">
       <ModuleHeader eyebrow="Module 5 · Communicate the Thinking" question="How do we use journey thinking under interview pressure?" section={section} totalSections={TOTAL} trace="E" />
 
-      {section === 1 && <SceneClarify lab={lab} />}
-      {section === 2 && <SceneActor lab={lab} />}
-      {section === 3 && <SceneGoal lab={lab} />}
-      {section === 4 && <SceneJourney lab={lab} />}
-      {section === 5 && <SceneProblems lab={lab} />}
-      {section === 6 && <ScenePriority lab={lab} />}
-      {section === 7 && <SceneDirections lab={lab} />}
-      {section === 8 && <SceneChain lab={lab} />}
-      {section === 9 && <SceneSuccess lab={lab} />}
-      {section === 10 && <SceneAdaptation lab={lab} />}
-      {section === 11 && <SceneReference />}
-      {section === 12 && <ScenePlayback lab={lab} />}
-      {section === 13 && <SceneRecap lab={lab} />}
+      {section === 1 && <SceneCircles />}
+      {section === 2 && <SceneClarify lab={lab} />}
+      {section === 3 && <SceneActor lab={lab} />}
+      {section === 4 && <SceneGoal lab={lab} />}
+      {section === 5 && <SceneJourney lab={lab} />}
+      {section === 6 && <SceneProblems lab={lab} />}
+      {section === 7 && <ScenePriority lab={lab} />}
+      {section === 8 && <SceneDirections lab={lab} />}
+      {section === 9 && <SceneChain lab={lab} />}
+      {section === 10 && <SceneSuccess lab={lab} />}
+      {section === 11 && <SceneAdaptation lab={lab} />}
+      {section === 12 && <SceneReference />}
+      {section === 13 && <ScenePlayback lab={lab} />}
+      {section === 14 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -69,10 +82,38 @@ export function Module5({ lab }: { lab: LabProgressApi }) {
   );
 }
 
+function SceneCircles() {
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
+  return (
+    <LabCard>
+      <FrameworkBadge name="CIRCLES Method" source="Lewis C. Lin, Decode and Conquer">
+        <p>A real, widely-used structure for product-design interview questions. Every scene in this module is labeled with the letter it's teaching, so you can see the framework in action rather than just naming it.</p>
+      </FrameworkBadge>
+      <h2 className="mt-3 text-sm font-bold text-[var(--color-ink)]">The seven steps</h2>
+      <div className="mt-2 space-y-1.5">
+        {circlesSteps.map((s, i) => {
+          const open = openIdx === i;
+          return (
+            <div key={`${s.letter}-${i}`} className="rounded-xl border border-[var(--color-border)]">
+              <button type="button" onClick={() => setOpenIdx(open ? null : i)} className="flex w-full items-center gap-2 p-2.5 text-left">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded bg-[var(--color-accent)] text-xs font-bold text-white">{s.letter}</span>
+                <span className="flex-1 text-sm font-bold text-[var(--color-ink)]">{s.name}</span>
+                <ChevronDown size={14} className={`shrink-0 text-[var(--color-slate)] transition-transform ${open ? "rotate-180" : ""}`} />
+              </button>
+              {open && <p className="animate-fade-in-up border-t border-[var(--color-border)] p-2.5 text-xs text-[var(--color-slate)]">{s.detail}</p>}
+            </div>
+          );
+        })}
+      </div>
+    </LabCard>
+  );
+}
+
 function SceneClarify({ lab }: { lab: LabProgressApi }) {
   const selected = lab.state.multi["m5-clarify"] ?? [];
   return (
     <LabCard>
+      <CircleTag letter="C" name="Comprehend the situation" />
       <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Interview case</p>
       <p className="mt-1 text-sm font-bold text-[var(--color-ink)]">{interviewPrompt}</p>
       <LabLabel>Pick up to two questions you'd actually ask</LabLabel>
@@ -96,6 +137,7 @@ function SceneActor({ lab }: { lab: LabProgressApi }) {
   const chosen = lab.state.selections["m5-actor"] ?? "";
   return (
     <LabCard>
+      <CircleTag letter="I" name="Identify the customer" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Choose an actor and situation</h2>
       <div className="mt-2 flex flex-wrap gap-1.5">
         {actorSegments.map((a) => (
@@ -118,6 +160,7 @@ function SceneActor({ lab }: { lab: LabProgressApi }) {
 function SceneGoal({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
+      <CircleTag letter="R" name="Report the customer's needs" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">State the goal without using the product</h2>
       <div className="mt-2">
         <ChoiceReveal options={goalOptions} selected={lab.state.selections["m5-goal"] ?? null} onSelect={(id) => lab.setSelection("m5-goal", id)} />
@@ -129,6 +172,7 @@ function SceneGoal({ lab }: { lab: LabProgressApi }) {
 function SceneJourney({ lab }: { lab: LabProgressApi }) {
   return (
     <LabCard>
+      <CircleTag letter="R" name="Report the customer's needs — continued" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Narrate the current journey</h2>
       <div className="mt-2 space-y-4">
         {journeyStages5.map((s, i) => (
@@ -151,6 +195,7 @@ function SceneProblems({ lab }: { lab: LabProgressApi }) {
   const selected = lab.state.multi["m5-problems"] ?? [];
   return (
     <LabCard>
+      <CircleTag letter="R" name="Report the customer's needs — continued" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Identify problems without solution language</h2>
       <LabLabel>Pick up to three you'd raise as real problems</LabLabel>
       <SelectChips options={possibleProblems} selected={selected} onToggle={(o) => lab.toggleMulti("m5-problems", o)} max={3} />
@@ -176,6 +221,7 @@ function ScenePriority({ lab }: { lab: LabProgressApi }) {
 
   return (
     <LabCard>
+      <CircleTag letter="C" name="Cut, through prioritization" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Prioritize transparently</h2>
       <p className="mt-1 text-xs text-[var(--color-slate)]">Reorder your chosen problems from most to least worth solving first.</p>
       <div className="mt-2">
@@ -197,6 +243,7 @@ function SceneDirections({ lab }: { lab: LabProgressApi }) {
   const direction = solutionDirections.find((d) => d.id === chosen);
   return (
     <LabCard>
+      <CircleTag letter="L" name="List solutions" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Explore solution directions</h2>
       <div className="mt-2 space-y-2">
         {solutionDirections.map((d) => (
@@ -236,6 +283,7 @@ function SceneChain({ lab }: { lab: LabProgressApi }) {
 
   return (
     <LabCard>
+      <CircleTag letter="E" name="Evaluate trade-offs" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Connect solution to journey and risk</h2>
       <p className="mt-1 text-xs text-[var(--color-slate)]">Reorder these five links into: evidence/problem → behavior change → user outcome → metric → risk.</p>
       <div className="mt-2">
@@ -259,6 +307,7 @@ function SceneSuccess({ lab }: { lab: LabProgressApi }) {
   const guardrailsPicked = lab.state.multi["m5-guardrails"] ?? [];
   return (
     <LabCard>
+      <CircleTag letter="E" name="Evaluate trade-offs — continued" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Define success</h2>
       <p className="mt-2 text-xs font-bold text-[var(--color-ink)]">North-star user outcome</p>
       <p className="text-xs text-[var(--color-slate)]">{northStar}</p>
@@ -276,6 +325,7 @@ function SceneAdaptation({ lab }: { lab: LabProgressApi }) {
   const picked = lab.state.multi["m5-adaptation"] ?? [];
   return (
     <LabCard>
+      <CircleTag letter="E" name="Evaluate trade-offs — stress test" />
       <h2 className="text-sm font-bold text-[var(--color-ink)]">Adaptation challenge</h2>
       <p className="mt-2 rounded-xl bg-[var(--color-danger-soft)] p-3 text-sm text-[var(--color-ink)]">New constraint: {adaptationConstraint}</p>
       <LabLabel>Which adaptations would you apply, keeping the prioritized need stable?</LabLabel>
@@ -360,6 +410,7 @@ function SceneRecap({ lab }: { lab: LabProgressApi }) {
   return (
     <div className="space-y-4">
       <LabCard>
+        <CircleTag letter="S" name="Summarize your recommendation" />
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-accent)]">Your Interview Case Storyboard</p>
         <ul className="mt-2 space-y-1.5 text-sm text-[var(--color-ink)]">
           {actor && (
@@ -382,6 +433,11 @@ function SceneRecap({ lab }: { lab: LabProgressApi }) {
           )}
         </ul>
         <p className="mt-2 text-xs text-[var(--color-slate)]">This storyboard is assembled from the choices, rankings, and sorts you made throughout the module.</p>
+      </LabCard>
+      <LabCard>
+        <FrameworkBadge name="CIRCLES Method — completed" source="Lewis C. Lin, Decode and Conquer">
+          <p>You've now walked all seven steps: Comprehend, Identify, Report, Cut, List, Evaluate, and Summarize. In an actual interview, this is the structure examiners recognize — even when you never say the word "CIRCLES" out loud.</p>
+        </FrameworkBadge>
       </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>

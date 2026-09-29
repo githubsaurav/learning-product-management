@@ -21,48 +21,52 @@ export const successBoundaries = [
 
 export const successBoundaryLesson = "A journey often exposes success definitions that are locally convenient but incomplete from the user's perspective.";
 
+/** The real, published seven lenses — not an invented list. Source: Kim Flaherty,
+ * "7 Ways to Analyze a Customer-Journey Map," Nielsen Norman Group. */
+export const analysisLensesSource = "Kim Flaherty, Nielsen Norman Group, “7 Ways to Analyze a Customer-Journey Map”";
+
 export const analysisLenses = [
   {
-    id: "expectation",
-    title: "1. Expectation gaps",
-    ask: "Where was the expectation created, and where was it violated?",
+    id: "expectations",
+    title: "1. Unmet Expectations",
+    ask: "Where was an expectation created, and where was it violated?",
     inCase: ["“Easy returns” suggests that approval equals simplicity.", "Packaging guidance is ambiguous.", "Pickup and refund timing are not reliably understood."],
   },
   {
-    id: "effort",
-    title: "2. Unnecessary effort",
-    ask: "Where must the user repeat, translate, remember, coordinate, or compensate for the service?",
+    id: "touchpoints",
+    title: "2. Unnecessary Touchpoints",
+    ask: "Which interactions could be removed without losing anything the user needs?",
+    inCase: ["Contacting support to repeat the full history is a touchpoint that shouldn't be necessary.", "A second pickup call could have been avoided with a better handoff the first time."],
+  },
+  {
+    id: "friction",
+    title: "3. Friction Points",
+    ask: "Where does the user experience the most difficulty or resistance?",
     inCase: ["Rahul repeats the history to support.", "He works around a pickup window that ignores his availability.", "He monitors refund status because the system does not carry confidence forward."],
   },
   {
-    id: "emotion",
-    title: "3. Emotional low points",
-    ask: "Where do uncertainty, loss of control, anxiety, or frustration accumulate?",
-    inCase: ["The deepest emotional point may not be the longest step — the failed pickup signals the process can reset through no fault of the user."],
-  },
-  {
     id: "transitions",
-    title: "4. Channel transitions",
+    title: "4. Channel Transitions",
     ask: "Where does the journey move between app, email, phone, physical space, another device, or another person?",
     inCase: ["Transitions frequently lose context.", "Rahul's digital approval does not ensure the courier understands the situation."],
   },
   {
     id: "time",
-    title: "5. Time and waiting",
-    ask: "Distinguish active time, calendar time, and uncertain time.",
+    title: "5. Time Duration",
+    ask: "How much time — active, calendar, and uncertain — does each stage actually take?",
     inCase: ["Active effort: minutes Rahul spends taking action.", "Calendar time: days between failure and refund.", "Uncertain time: periods when Rahul does not know what will happen next."],
   },
   {
-    id: "workarounds",
-    title: "6. Workarounds and compensating behavior",
-    ask: "What unmet need does this workaround reveal?",
-    inCase: ["Keeping screenshots.", "Calling the courier directly.", "Postponing a replacement purchase.", "Remaining home during a vague pickup window."],
+    id: "truth",
+    title: "6. Moments of Truth",
+    ask: "If this moment goes badly, what happens downstream to trust or confidence?",
+    inCase: ["Discovering the defect.", "Receiving approval.", "Experiencing the failed pickup.", "Seeing the refund completed."],
   },
   {
-    id: "truth",
-    title: "7. Moments of truth",
-    ask: "If this moment goes badly, what happens downstream?",
-    inCase: ["Discovering the defect.", "Receiving approval.", "Experiencing the failed pickup.", "Seeing the refund completed."],
+    id: "high",
+    title: "7. High Points",
+    ask: "Where did the experience meet or exceed expectations — and what should be protected, not “fixed”?",
+    inCase: ["The return was approved in under two minutes.", "The second pickup attempt succeeded with no extra cost to Rahul."],
   },
 ];
 
@@ -150,6 +154,22 @@ export const interventionCategories = [
       { id: "strong", text: "Reschedule a failed attempt without making the user contact support.", strongest: true, note: "Directly shortens the exact recovery path Rahul was forced through." },
       { id: "weak", text: "Offer a discount coupon after a failed pickup.", note: "Doesn't fix the underlying coordination problem — just softens the frustration." },
     ],
+  },
+];
+
+export const ostOutcome = "Return experiences that preserve the customer's confidence in the category — measured as repurchase rate within 60 days of a completed return.";
+
+export const ostAssumptionTests = [
+  {
+    id: "pilot",
+    text: "Run a 2-week pilot letting a small share of pickup requests include a customer-declared unavailable window, then measure the missed-pickup rate against the control group.",
+    strongest: true,
+    note: "This tests the riskiest assumption directly — that giving customers control actually reduces missed pickups — with real behavior, not a stated preference.",
+  },
+  {
+    id: "interview",
+    text: "Interview 8 recent return customers about what they assumed would happen right after requesting a pickup slot.",
+    note: "Cheaper to run, but it tests what customers say they want, not what they'd actually do — a weaker substitute for the pilot.",
   },
 ];
 

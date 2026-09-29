@@ -7,6 +7,7 @@ import { BoundaryInserter } from "@/lab/components/BoundaryInserter";
 import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { ExpertOverlay } from "@/lab/components/ExpertOverlay";
+import { FrameworkBadge } from "@/lab/components/FrameworkBadge";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
@@ -123,7 +124,10 @@ function SceneSpineAndStages({ lab }: { lab: LabProgressApi }) {
 function SceneLayers() {
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Add the layers, one at a time</h2>
+      <FrameworkBadge name="The 5 components of a journey map" source="Nielsen Norman Group, “Journey Mapping 101”">
+        <p>NN/g names five real components: <span className="font-bold">Actor, Scenario + Expectations, Journey Phases, Actions/Mindsets/Emotions, and Opportunities.</span> The seven layers below are a more granular version of the same idea — they group into those five.</p>
+      </FrameworkBadge>
+      <h2 className="mt-3 text-sm font-bold text-[var(--color-ink)]">Add the layers, one at a time</h2>
       <div className="mt-2 space-y-3">
         {layerTeachings.map((l) => (
           <div key={l.key} className="rounded-xl border border-[var(--color-border)] p-3">
@@ -302,6 +306,11 @@ function SceneRecap({ lab }: { lab: LabProgressApi }) {
           You placed {correct} of {total} snippets in their matching stage across the layers you sorted.
         </p>
         <p className="mt-2 text-xs text-[var(--color-slate)]">This map — your stage boundaries, your sorted layers, and your future-state pick — is the model you built by interacting with the evidence, not by writing about it.</p>
+      </LabCard>
+      <LabCard>
+        <FrameworkBadge name="The 5-Step Customer Journey Mapping Process — completed" source="Kate Kaplan, Nielsen Norman Group">
+          <p>You've now done all five real steps across three modules: Aspiration and Allies (Module 1's scope), Internal Investigation and Assumption Formulation and External Research (Module 2's evidence work), and Narrative Visualization (the map you just built here).</p>
+        </FrameworkBadge>
       </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>

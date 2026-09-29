@@ -37,6 +37,13 @@ export function StudioHome({ lab, onOpenModule }: { lab: LabProgressApi; onOpenM
                   {reachedRecap ? <CheckCircle2 size={16} className="shrink-0 text-[var(--color-success)]" /> : visited ? <CircleDot size={16} className="shrink-0 text-[var(--color-accent)]" /> : null}
                 </div>
                 <p className="mt-1.5 text-xs text-[var(--color-slate)]">{m.caseLabel}</p>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {m.frameworks.map((f) => (
+                    <span key={f} className="rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-2)]">
+                      🔑 {f}
+                    </span>
+                  ))}
+                </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold text-[var(--color-slate)]">
                   <span className="rounded-full bg-black/[0.04] px-2 py-0.5">{m.estimate}</span>
                   <span className="rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[var(--color-accent-2)]">TRACE: {m.trace}</span>

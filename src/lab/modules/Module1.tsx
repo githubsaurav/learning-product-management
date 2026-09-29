@@ -5,6 +5,7 @@ import { TimelineSlider } from "@/lab/components/TimelineSlider";
 import { MadLibSentence } from "@/lab/components/MadLibSentence";
 import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { SelectChips } from "@/lab/components/SelectChips";
+import { FrameworkBadge } from "@/lab/components/FrameworkBadge";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
@@ -18,6 +19,9 @@ import {
   teams,
   framingDecisions,
   madLibBlanks,
+  jtbdQuote,
+  jtbdExample,
+  jtbdChoice,
   cameraLenses,
   thinkingTraps,
   reflectionQuestions,
@@ -25,7 +29,7 @@ import {
   transferFramings,
 } from "@/lab/data/module1";
 
-const TOTAL = 9;
+const TOTAL = 10;
 
 export function Module1({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m1");
@@ -38,11 +42,12 @@ export function Module1({ lab }: { lab: LabProgressApi }) {
       {section === 2 && <SceneParticipant lab={lab} />}
       {section === 3 && <SceneThreeTeams lab={lab} />}
       {section === 4 && <SceneFraming lab={lab} />}
-      {section === 5 && <SceneCamera lab={lab} />}
-      {section === 6 && <SceneTraps />}
-      {section === 7 && <SceneReflection lab={lab} />}
-      {section === 8 && <SceneTransfer lab={lab} />}
-      {section === 9 && <SceneRecap lab={lab} />}
+      {section === 5 && <SceneJTBD lab={lab} />}
+      {section === 6 && <SceneCamera lab={lab} />}
+      {section === 7 && <SceneTraps />}
+      {section === 8 && <SceneReflection lab={lab} />}
+      {section === 9 && <SceneTransfer lab={lab} />}
+      {section === 10 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -192,7 +197,7 @@ function SceneCamera({ lab }: { lab: LabProgressApi }) {
       <div className="mt-4 rounded-xl border border-[var(--color-accent)]/25 bg-[var(--color-accent-soft)] p-3.5">
         <p className="text-sm font-bold text-[var(--color-ink)]">{lens.name}</p>
         <p className="mt-1 text-xs text-[var(--color-ink)]">
-          <span className="font-bold">Question: </span>
+          <span className="font-bold">Definition: </span>
           {lens.question}
         </p>
         <p className="mt-1 text-xs text-[var(--color-ink)]">
@@ -203,6 +208,30 @@ function SceneCamera({ lab }: { lab: LabProgressApi }) {
           <span className="font-bold">Example: </span>
           {lens.example}
         </p>
+        {lens.source && <p className="mt-1.5 text-[10px] italic text-[var(--color-slate)]">Source: {lens.source}</p>}
+      </div>
+    </LabCard>
+  );
+}
+
+function SceneJTBD({ lab }: { lab: LabProgressApi }) {
+  const pick = lab.state.selections["m1-jtbd"] ?? null;
+  return (
+    <LabCard>
+      <FrameworkBadge name="Jobs to Be Done (JTBD)" source="Clayton Christensen, Harvard Business School">
+        <p className="italic">{jtbdQuote}</p>
+        <p>{jtbdExample}</p>
+      </FrameworkBadge>
+      <h2 className="mt-4 text-sm font-bold text-[var(--color-ink)]">What is Meera really hiring the app to do?</h2>
+      <div className="mt-2">
+        <ChoiceReveal
+          options={[
+            { id: "weak", text: jtbdChoice.weak, note: jtbdChoice.note },
+            { id: "strong", text: jtbdChoice.strong, note: jtbdChoice.note, strongest: true },
+          ]}
+          selected={pick}
+          onSelect={(id) => lab.setSelection("m1-jtbd", id)}
+        />
       </div>
     </LabCard>
   );

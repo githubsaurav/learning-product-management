@@ -97,6 +97,31 @@ everything you built as Markdown.
 - Every module's closing screen is a **recap assembled from what you
   clicked** — the framing sentence you built, the stage you placed each
   snippet in, the direction you picked — not a form you filled in.
+- **Every module names a real, citable framework**, via a collapsible "🔑
+  Real framework" badge with a source line — never an invented exercise
+  presented as an established method:
+  - **Module 1 — Jobs to Be Done** (Clayton Christensen). Also cites NN/g's
+    actual definitions of a user journey, user flow, and service blueprint
+    instead of paraphrased ones.
+  - **Module 2 — the 5-Step Customer Journey Mapping Process** (Kate
+    Kaplan, NN/g): Aspiration and Allies, Internal Investigation, Assumption
+    Formulation, External Research, Narrative Visualization — the module
+    tells you which step you're doing as you do it.
+  - **Module 3 — the 5 real components of a journey map** (NN/g's Journey
+    Mapping 101): Actor, Scenario + Expectations, Journey Phases,
+    Actions/Mindsets/Emotions, Opportunities.
+  - **Module 4 — four frameworks in one case**: NN/g's actual 7 journey-map
+    analysis lenses (Unmet Expectations, Unnecessary Touchpoints, Friction
+    Points, Channel Transitions, Time Duration, Moments of Truth, High
+    Points), the **5 Whys**, Teresa Torres's **Opportunity Solution Tree**
+    (outcome → opportunity → solution → assumption test, built from your
+    own earlier picks), and **RICE/ICE** scoring.
+  - **Module 5 — the CIRCLES Method** (Lewis C. Lin, *Decode and Conquer*):
+    every scene is labeled with the letter it's teaching (Comprehend,
+    Identify, Report, Cut, List, Evaluate, Summarize), so the interview
+    structure is visible while you practice it, not just named at the end.
+  - The **Concept Shelf** glossary carries a "Source:" line on every entry
+    that names a real framework rather than a general term.
 
 ## Code structure
 

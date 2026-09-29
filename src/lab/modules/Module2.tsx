@@ -6,6 +6,7 @@ import { LabCard, LabLabel } from "@/lab/components/Card";
 import { SelectChips } from "@/lab/components/SelectChips";
 import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
+import { FrameworkBadge } from "@/lab/components/FrameworkBadge";
 import { ReadingList } from "@/lab/components/ReadingList";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
@@ -24,9 +25,10 @@ import {
   synthesisRules,
   researchPlanQuestions,
   firstExplanationOptions,
+  nngProcessSteps,
 } from "@/lab/data/module2";
 
-const TOTAL = 10;
+const TOTAL = 11;
 
 export function Module2({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m2");
@@ -44,7 +46,8 @@ export function Module2({ lab }: { lab: LabProgressApi }) {
       {section === 7 && <SceneWindows />}
       {section === 8 && <SceneSynthesis lab={lab} />}
       {section === 9 && <SceneResearchPlan lab={lab} />}
-      {section === 10 && <SceneRecap lab={lab} />}
+      {section === 10 && <SceneProcess />}
+      {section === 11 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -325,6 +328,27 @@ function SceneResearchPlan({ lab }: { lab: LabProgressApi }) {
             <div className="mt-2">
               <ChoiceReveal options={rq.options} selected={lab.state.selections[`m2-plan-${i}`] ?? null} onSelect={(id) => lab.setSelection(`m2-plan-${i}`, id)} />
             </div>
+          </div>
+        ))}
+      </div>
+    </LabCard>
+  );
+}
+
+function SceneProcess() {
+  return (
+    <LabCard>
+      <FrameworkBadge name="The 5-Step Customer Journey Mapping Process" source="Kate Kaplan, Nielsen Norman Group">
+        <p>The steps you've just been doing (and the one still ahead in Module 3) have real names — this is the actual process practitioners use.</p>
+      </FrameworkBadge>
+      <div className="mt-3 space-y-2">
+        {nngProcessSteps.map((s, i) => (
+          <div key={s.name} className={`rounded-xl border p-3 ${i === 1 || i === 2 || i === 3 ? "border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)]" : "border-[var(--color-border)]"}`}>
+            <p className="text-sm font-bold text-[var(--color-ink)]">
+              {i + 1}. {s.name}
+            </p>
+            <p className="text-xs text-[var(--color-slate)]">{s.detail}</p>
+            <p className="mt-1 text-xs font-semibold text-[var(--color-accent)]">{s.doneIn}</p>
           </div>
         ))}
       </div>

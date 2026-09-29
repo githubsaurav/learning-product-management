@@ -218,6 +218,14 @@ export const synthesisPairs = [
   },
 ];
 
+export const nngProcessSteps = [
+  { name: "Aspiration and Allies", detail: "Building a cross-disciplinary team and defining the scope of the mapping initiative.", doneIn: "Module 1 — you set the actor, goal, and scope." },
+  { name: "Internal Investigation", detail: "Gathering existing customer data and research that exists throughout the organization.", doneIn: "This module — the evidence room (Sources A–F)." },
+  { name: "Assumption Formulation", detail: "Formulating a hypothesis of the current-state journey and planning further research.", doneIn: "This module — your first explanation, before seeing any evidence." },
+  { name: "External Research", detail: "Collecting new user data to validate or invalidate the hypothesis.", doneIn: "This module — the questions you'd ask, and your research plan." },
+  { name: "Narrative Visualization", detail: "Combining insights and research into a visual narrative of the journey.", doneIn: "Module 3 — the map you build next." },
+];
+
 export const researchPlanQuestions = [
   {
     question: "The decision the team needs to make",

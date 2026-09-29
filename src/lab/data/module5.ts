@@ -1,3 +1,14 @@
+/** The real, published 7-step interview framework this module walks through. Source: Lewis C. Lin, "Decode and Conquer." */
+export const circlesSteps = [
+  { letter: "C", name: "Comprehend the situation", detail: "Clarify the problem and restate the goal before assuming anything." },
+  { letter: "I", name: "Identify the customer", detail: "Choose a specific segment and situation — not a generic “user.”" },
+  { letter: "R", name: "Report the customer's needs", detail: "State the underlying goal and walk the current journey to surface real needs." },
+  { letter: "C", name: "Cut, through prioritization", detail: "Rank the problems you found and defend which one deserves attention first." },
+  { letter: "L", name: "List solutions", detail: "Generate solution directions and choose a coherent minimum." },
+  { letter: "E", name: "Evaluate trade-offs", detail: "Connect the solution to behavior, metrics, and risk, and stress-test it against new constraints." },
+  { letter: "S", name: "Summarize your recommendation", detail: "Close with a clear, structured recommendation an interviewer can follow." },
+];
+
 export const interviewPrompt = "Improve Google Maps for a group of friends planning a weekend trip.";
 
 export const clarifyAreas = [

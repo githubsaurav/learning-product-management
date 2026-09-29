@@ -9,6 +9,7 @@ import { ChoiceReveal } from "@/lab/components/ChoiceReveal";
 import { OrderableList } from "@/lab/components/OrderableList";
 import { EvidenceBoard } from "@/lab/components/EvidenceBoard";
 import { ReadingList } from "@/lab/components/ReadingList";
+import { FrameworkBadge } from "@/lab/components/FrameworkBadge";
 import { useModuleSection } from "@/lab/state/useModuleSection";
 import type { LabProgressApi } from "@/lab/state/useLabProgress";
 import { module4Reading } from "@/lab/data/readingRoom";
@@ -18,6 +19,7 @@ import {
   successBoundaries,
   successBoundaryLesson,
   analysisLenses,
+  analysisLensesSource,
   rootCauseExample,
   opportunityForms,
   candidateOpportunities,
@@ -27,9 +29,11 @@ import {
   metricLevels,
   metricSortItems,
   activationTeaching,
+  ostOutcome,
+  ostAssumptionTests,
 } from "@/lab/data/module4";
 
-const TOTAL = 9;
+const TOTAL = 10;
 
 export function Module4({ lab }: { lab: LabProgressApi }) {
   const { section, setSection } = useModuleSection(lab, "m4");
@@ -43,9 +47,10 @@ export function Module4({ lab }: { lab: LabProgressApi }) {
       {section === 4 && <SceneOpportunity />}
       {section === 5 && <ScenePrioritize lab={lab} />}
       {section === 6 && <SceneInterventions lab={lab} />}
-      {section === 7 && <SceneMetrics lab={lab} />}
-      {section === 8 && <SceneActivation />}
-      {section === 9 && <SceneRecap lab={lab} />}
+      {section === 7 && <SceneOST lab={lab} />}
+      {section === 8 && <SceneMetrics lab={lab} />}
+      {section === 9 && <SceneActivation />}
+      {section === 10 && <SceneRecap lab={lab} />}
 
       <div className="flex gap-2">
         {section > 1 && (
@@ -89,7 +94,10 @@ function SceneLenses() {
   const [openId, setOpenId] = useState<string | null>(analysisLenses[0].id);
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Seven analysis lenses</h2>
+      <FrameworkBadge name="7 Ways to Analyze a Customer-Journey Map" source={analysisLensesSource}>
+        <p>These are the real seven lenses practitioners use to read a finished map — not a generic checklist.</p>
+      </FrameworkBadge>
+      <h2 className="mt-3 text-sm font-bold text-[var(--color-ink)]">Seven analysis lenses</h2>
       <div className="mt-2 space-y-2">
         {analysisLenses.map((lens) => {
           const open = openId === lens.id;
@@ -121,7 +129,10 @@ function SceneRootCause({ lab }: { lab: LabProgressApi }) {
   const revealed = lab.state.hints["m4-ladder"] ?? 0;
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Root-cause ladder</h2>
+      <FrameworkBadge name="5 Whys" source="Sakichi Toyoda / Toyota Production System">
+        <p>Asking "what made that consequential?" repeatedly is the same move as the classic 5 Whys — keep descending past the first answer until you hit something structural.</p>
+      </FrameworkBadge>
+      <h2 className="mt-3 text-sm font-bold text-[var(--color-ink)]">Root-cause ladder</h2>
       <p className="mt-1 rounded-xl bg-black/[0.03] p-3 text-sm font-bold text-[var(--color-ink)]">Visible problem: {rootCauseExample.problem}</p>
       <p className="mt-2 text-xs text-[var(--color-slate)]">Click through “What made that consequential?” one rung at a time, descending toward structural causes.</p>
       <div className="mt-3">
@@ -165,7 +176,13 @@ function ScenePrioritize({ lab }: { lab: LabProgressApi }) {
 
   return (
     <LabCard>
-      <h2 className="text-sm font-bold text-[var(--color-ink)]">Prioritization studio</h2>
+      <FrameworkBadge name="RICE / ICE scoring" source="Intercom (RICE); common lean/startup practice (ICE)">
+        <p>
+          The dimensions below are a journey-mapping version of the same idea behind <span className="font-bold">RICE</span> (Reach, Impact, Confidence, Effort) and{" "}
+          <span className="font-bold">ICE</span> (Impact, Confidence, Ease) — named frameworks for turning "which is more important" into an explicit, comparable score instead of a gut call.
+        </p>
+      </FrameworkBadge>
+      <h2 className="mt-3 text-sm font-bold text-[var(--color-ink)]">Prioritization studio</h2>
       <p className="mt-1 text-xs text-[var(--color-slate)]">Four candidate opportunities from Rahul's case. Reorder them from most to least worth investigating.</p>
       <div className="mt-2">
         <LabLabel>Consider: user impact, frequency, journey leverage, strategic relevance, evidence confidence</LabLabel>
@@ -205,6 +222,51 @@ function SceneInterventions({ lab }: { lab: LabProgressApi }) {
           <li key={q}>• {q}</li>
         ))}
       </ul>
+    </LabCard>
+  );
+}
+
+function SceneOST({ lab }: { lab: LabProgressApi }) {
+  const order = lab.state.multi["m4-priority-order"]?.length ? lab.state.multi["m4-priority-order"] : candidateOpportunities.map((o) => o.id);
+  const top = candidateOpportunities.find((o) => o.id === order[0]);
+  const solutions = interventionCategories
+    .map((c) => ({ label: c.label, pick: c.options.find((o) => o.id === lab.state.selections[`m4-intervention-${c.key}`]) }))
+    .filter((c) => c.pick);
+  const testPick = lab.state.selections["m4-ost-test"] ?? null;
+
+  return (
+    <LabCard>
+      <FrameworkBadge name="Opportunity Solution Tree" source="Teresa Torres, Product Talk">
+        <p>One outcome branches into opportunities (unmet needs, pains, desires), each opportunity branches into candidate solutions, and each solution branches into the assumptions you'd need to test before betting on it. It's the same material you've already built in this module — just organized as a tree.</p>
+      </FrameworkBadge>
+
+      <div className="mt-3 space-y-2">
+        <div className="rounded-xl border border-[var(--color-border)] bg-black/[0.03] p-3">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-slate)]">Outcome</p>
+          <p className="text-sm font-bold text-[var(--color-ink)]">{ostOutcome}</p>
+        </div>
+
+        <div className="ml-3 rounded-xl border border-[var(--color-accent)]/30 bg-[var(--color-accent-soft)] p-3">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-accent)]">Opportunity (your top pick)</p>
+          <p className="text-sm text-[var(--color-ink)]">{top?.text ?? "Rank opportunities in the previous module to see your pick here."}</p>
+        </div>
+
+        {solutions.length > 0 && (
+          <div className="ml-6 space-y-1.5">
+            <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--color-slate)]">Solutions (your picks)</p>
+            {solutions.map((s) => (
+              <div key={s.label} className="rounded-xl border border-[var(--color-border)] p-2.5">
+                <p className="text-xs font-bold text-[var(--color-ink)]">{s.label}</p>
+                <p className="text-xs text-[var(--color-slate)]">{s.pick?.text}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <LabLabel>Which assumption test would you run first?</LabLabel>
+      <ChoiceReveal options={ostAssumptionTests} selected={testPick} onSelect={(id) => lab.setSelection("m4-ost-test", id)} />
+      <p className="mt-2 text-xs italic text-[var(--color-slate)]">A tree keeps solutions provisional — every branch stays open to being cut if the assumption test fails.</p>
     </LabCard>
   );
 }
@@ -290,6 +352,11 @@ function SceneRecap({ lab }: { lab: LabProgressApi }) {
           </ul>
         )}
         <p className="mt-2 text-xs text-[var(--color-slate)]">This brief is built from your ranking and your intervention picks — the model you assembled, not typed.</p>
+      </LabCard>
+      <LabCard>
+        <FrameworkBadge name="Frameworks used in this module" source="NN/g · Toyota Production System · Teresa Torres · Intercom / lean practice">
+          <p>7 Ways to Analyze a Customer-Journey Map, the 5 Whys, the Opportunity Solution Tree, and RICE/ICE scoring — four real tools, applied to one case.</p>
+        </FrameworkBadge>
       </LabCard>
       <LabCard>
         <p className="text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">Recommended reading</p>

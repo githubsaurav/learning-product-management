@@ -40,6 +40,7 @@ export function ConceptShelfScreen() {
               </p>
             )}
             <p className="mt-1 text-xs italic text-[var(--color-accent-2)]">Ask: {g.ask}</p>
+            {g.source && <p className="mt-1 text-[10px] italic text-[var(--color-slate)]">Source: {g.source}</p>}
           </LabCard>
         ))}
         {filtered.length === 0 && <p className="text-sm text-[var(--color-slate)]">No concepts match “{query}.”</p>}

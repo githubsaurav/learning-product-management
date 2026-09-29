@@ -4,6 +4,8 @@ export interface GlossaryEntry {
   example: string;
   contrast?: string;
   ask: string;
+  /** Cited when the entry names a real, published framework rather than a general concept. */
+  source?: string;
 }
 
 export const glossary: GlossaryEntry[] = [
@@ -63,6 +65,7 @@ export const glossary: GlossaryEntry[] = [
     definition: "The progress a person seeks in a particular circumstance, including functional, emotional, and social dimensions.",
     example: "Use it to move beyond product categories and understand alternatives.",
     ask: "What is this person really hiring a product to do?",
+    source: "Clayton Christensen, Harvard Business School",
   },
   {
     term: "Moment of truth",
@@ -165,5 +168,36 @@ export const glossary: GlossaryEntry[] = [
     definition: "A meaningful possibility to improve user progress or outcomes. It should be framed independently enough to permit several solutions.",
     example: "“Working customers need a dependable way to coordinate item handoff.”",
     ask: "Does this open a design space, or does it name one feature?",
+  },
+  {
+    term: "5 Whys",
+    definition: "Repeatedly asking why a problem occurred — descending past the first, surface answer toward a structural cause.",
+    example: "Missed the courier call → broad pickup window → real-time coordination required → context lost between systems → success measured at approval, not recovery.",
+    contrast: "Stopping at the first “why” treats a symptom as the root cause.",
+    ask: "What made that consequential — and what made that consequential?",
+    source: "Sakichi Toyoda / Toyota Production System",
+  },
+  {
+    term: "Opportunity Solution Tree",
+    definition: "A visual structure connecting one outcome to the opportunities that could move it, the solutions that address each opportunity, and the assumption tests needed before committing to a solution.",
+    example: "Outcome → “coordinate item handoff” opportunity → “let users declare unavailability” solution → a two-week pilot testing whether that reduces missed pickups.",
+    contrast: "A flat feature backlog has no explicit link back to the outcome or the opportunity a feature serves.",
+    ask: "What assumption would have to be true for this solution to work?",
+    source: "Teresa Torres, Product Talk",
+  },
+  {
+    term: "CIRCLES Method",
+    definition: "A seven-step structure for product-design interview questions: Comprehend, Identify, Report, Cut, List, Evaluate, Summarize.",
+    example: "Used end-to-end on the “improve Google Maps for a group trip” interview case.",
+    ask: "Which of the seven steps am I in right now, and have I actually done it?",
+    source: "Lewis C. Lin, Decode and Conquer",
+  },
+  {
+    term: "RICE / ICE",
+    definition: "Scoring models for prioritization. RICE: Reach, Impact, Confidence, Effort. ICE: Impact, Confidence, Ease.",
+    example: "Scoring four candidate opportunities from Rahul's return journey before committing to one.",
+    contrast: "Ranking by gut feeling hides which factor actually drove the decision.",
+    ask: "If I scored this explicitly, would the ranking survive?",
+    source: "RICE: Intercom. ICE: common lean/startup practice.",
   },
 ];
