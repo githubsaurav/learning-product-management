@@ -24,7 +24,7 @@ export function MadLibSentence({
 
   return (
     <div>
-      <p className="text-sm leading-relaxed text-[var(--color-ink)]">
+      <p className="text-base leading-relaxed text-[var(--color-ink)]">
         {parts.map((part, i) => {
           const match = part.match(/^\{([a-zA-Z0-9_]+)\}$/);
           if (!match) return <span key={i}>{part}</span>;
@@ -79,7 +79,7 @@ export function MadLibSentence({
         const opt = blank?.options.find((o) => o.id === optId);
         if (!opt) return null;
         return (
-          <p key={key} className="mt-1.5 animate-fade-in-up text-xs text-[var(--color-slate)]">
+          <p key={key} className="mt-1.5 animate-fade-in-up text-sm text-[var(--color-slate)]">
             <span className="font-bold text-[var(--color-accent)]">{key}: </span>
             {opt.effect}
           </p>

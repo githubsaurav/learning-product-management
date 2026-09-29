@@ -2,11 +2,64 @@ export const meeraIntro =
   "Meera has a 7:45 a.m. flight from Bengaluru. It is raining. The apartment security gate is slow to open, the airline has warned passengers to arrive early, and Meera is carrying a suitcase and a laptop bag. She has not opened a mobility app yet.";
 
 export const beginningTicks = [
-  { position: 5, label: "Booked the flight" },
-  { position: 28, label: "Planned when to leave" },
-  { position: 52, label: "Opened Uber/Ola" },
-  { position: 75, label: "Driver accepted" },
-  { position: 95, label: "Car arrived" },
+  { position: 5, label: "Booked the flight", icon: "🎫" },
+  { position: 28, label: "Planned when to leave", icon: "🕐" },
+  { position: 52, label: "Opened Uber/Ola", icon: "📱" },
+  { position: 75, label: "Driver accepted", icon: "🚗" },
+  { position: 95, label: "Car arrived", icon: "📍" },
+];
+
+/** Shown at the top (objective) and bottom (learned + common mistake) of each of the
+ * module's 10 sections — so every section states what it teaches before and after. */
+export const sectionCopy: { objective: string; learned: string; trap?: string }[] = [
+  {
+    objective: "Figure out where Meera's journey actually begins — and notice that it isn't a fact hidden in the data, it's a decision you make.",
+    learned: "The 'beginning' of Meera's journey moves depending on what question you're trying to answer — there's no single correct starting point waiting to be discovered.",
+    trap: "Defaulting to 'the journey starts when she opens the app' — the single most common mistake, because it silently erases everything that actually created the need for a ride.",
+  },
+  {
+    objective: "See how much of a real journey happens completely outside your own product's screens.",
+    learned: "Most of Meera's journey — checking the rain, talking to the security guard, waiting under the awning — never touches the app, yet it fully shapes whether the ride succeeds.",
+    trap: "Mapping only what happens inside your product's own interface, which quietly deletes every real-world step that actually determines the outcome.",
+  },
+  {
+    objective: "Learn why three teams looking at the exact same story can — and should — draw different boundaries around 'the journey.'",
+    learned: "Scope is chosen to serve a specific team's decision. The same lived experience supports several valid journeys, not one universal one.",
+    trap: "Assuming there's a single 'correct' journey map for a product, then arguing about whose boundaries are right instead of asking what each map needs to inform.",
+  },
+  {
+    objective: "Practice turning a vague situation into a sharp, specific framing sentence — the actual first move of any journey-mapping effort.",
+    learned: "A strong framing sentence names a specific actor, an outcome-based goal, real constraints, deliberate boundaries, and a clear learning objective — never the product itself.",
+    trap: "Writing a framing sentence around the product ('understand how people use the app') — it sounds like framing, but it explains nothing about the person.",
+  },
+  {
+    objective: "Learn to separate what a product does from the underlying 'job' a person is actually hiring it to do.",
+    learned: "Meera isn't hiring the app for 'a ride' — she's hiring it to reach her terminal with enough time and confidence despite an uncertain morning.",
+    trap: "Restating the product ('users want a ride') and mistaking that for a Jobs-to-Be-Done insight — it explains nothing about why she needs it.",
+  },
+  {
+    objective: "See how the same case looks completely different through five real mapping tools, from an intimate personal journey to an org-wide blueprint.",
+    learned: "A user journey, user flow, funnel, lifecycle, and service blueprint are not five words for the same thing — each is a real, named tool that answers a different question.",
+    trap: "Reaching for 'let's make a journey map' by default, when a funnel or service blueprint would actually answer the question being asked.",
+  },
+  {
+    objective: "Name the thinking traps that quietly distort a journey before any research even starts.",
+    learned: "All four traps share one root cause: letting the product's shape, or the company's internal process, substitute for the person's real, lived experience.",
+  },
+  {
+    objective: "Test whether you can apply everything so far to spot assumptions and evidence gaps inside Meera's story.",
+    learned: "Separating what the story actually states from what you quietly assumed is a core journey-mapping skill — not a minor detail to clean up later.",
+    trap: "Treating a plausible inference ('she's probably anxious') as if it were confirmed evidence — this is exactly how unverified assumptions sneak into a 'current-state' map.",
+  },
+  {
+    objective: "Prove you can frame a brand-new situation on your own — not just recognize the right answer inside Meera's story.",
+    learned: "The same weak-vs-strong pattern — product-centered versus outcome-centered — shows up in completely unrelated situations, from Netflix to splitting a dinner bill.",
+    trap: "Assuming this framing skill only applies to 'journey mapping exercises' — it's a general habit for any product conversation, not a one-off classroom trick.",
+  },
+  {
+    objective: "Pull everything from this module into one Journey Frame you could actually bring into an interview or a real project kickoff.",
+    learned: "A Journey Frame — actor, goal, scenario, scope, and objective — is the artifact that should exist before any research or mapping begins, and you just built one from scratch.",
+  },
 ];
 
 export const scopeReveal =
@@ -34,16 +87,19 @@ export const teams = [
   {
     id: "pickup",
     name: "Pickup team",
+    icon: "📦",
     charter: "Reduce failed or stressful pickups.",
   },
   {
     id: "airport",
     name: "Airport partnerships team",
+    icon: "✈️",
     charter: "Make airport travel predictable from planning through terminal arrival.",
   },
   {
     id: "payments",
     name: "Payments team",
+    icon: "💳",
     charter: "Reduce confusion about fares, tolls, and receipts.",
   },
 ];
@@ -70,6 +126,7 @@ export const framingEditEffects = [
 export interface CameraLens {
   id: string;
   name: string;
+  icon: string;
   question: string;
   contains: string;
   example: string;
@@ -80,6 +137,7 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "journey",
     name: "User journey",
+    icon: "🗺️",
     question: "“A scenario-based sequence of the steps that a user takes in order to accomplish a high-level goal with a company or product, usually across channels and over time.”",
     contains: "Stages, actions, thoughts, emotions, needs, touchpoints, channels, pain points, context.",
     example: "Meera getting from home to her airport terminal.",
@@ -88,6 +146,7 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "flow",
     name: "User flow",
+    icon: "🔀",
     question: "“A set of interactions that describe the typical or ideal set of steps needed to accomplish a common task performed with a product.”",
     contains: "Screens, actions, decisions, system responses, alternate paths.",
     example: "Selecting pickup and destination, choosing a ride type, and confirming the booking.",
@@ -96,6 +155,7 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "funnel",
     name: "Funnel",
+    icon: "📉",
     question: "A quantitative representation of where people progress or drop out across measurable, event-defined steps.",
     contains: "Population counts, conversion rates, stages defined by events.",
     example: "Search initiated → ride option viewed → booking requested → ride completed.",
@@ -103,6 +163,7 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "lifecycle",
     name: "Lifecycle",
+    icon: "🔁",
     question: "The evolution of a person's relationship with a product or company over time.",
     contains: "Acquisition, activation, engagement, retention, expansion, churn, or reactivation.",
     example: "First ride through becoming a recurring commuter.",
@@ -110,6 +171,7 @@ export const cameraLenses: CameraLens[] = [
   {
     id: "blueprint",
     name: "Service blueprint",
+    icon: "🏗️",
     question: "“A visualization of the relationships between different service components — people, props (physical or digital evidence), and processes — that are directly tied to touchpoints in a specific customer journey.”",
     contains: "Customer actions, visible service, backstage activity, support processes, dependencies.",
     example: "Dispatch logic, driver incentives, mapping systems, airport queues, customer support, and payment settlement behind Meera's ride.",

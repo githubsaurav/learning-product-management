@@ -13,9 +13,9 @@ export function FrameworkBadge({ name, source, children }: { name: string; sourc
         <ChevronDown size={13} className={`shrink-0 text-[var(--color-accent-2)] transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       {open && (
-        <div className="mt-2 animate-fade-in-up space-y-1.5 text-xs text-[var(--color-ink)]">
+        <div className="mt-2 animate-fade-in-up space-y-1.5 text-sm text-[var(--color-ink)]">
           {children}
-          <p className="text-[10px] italic text-[var(--color-slate)]">Source: {source}</p>
+          <p className="text-xs italic text-[var(--color-slate)]">Source: {source}</p>
         </div>
       )}
     </div>

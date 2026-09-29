@@ -38,14 +38,14 @@ export function ChoiceReveal({
             }`}
           >
             <div className="flex items-start justify-between gap-2">
-              <p className="text-sm font-medium text-[var(--color-ink)]">{opt.text}</p>
+              <p className="text-base font-medium text-[var(--color-ink)]">{opt.text}</p>
               {answered && opt.strongest && (
-                <span className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-2)]">
-                  <Sparkles size={10} /> Closer fit
+                <span className="flex shrink-0 items-center gap-1 rounded-full bg-[var(--color-accent-2-soft)] px-2 py-0.5 text-xs font-bold text-[var(--color-accent-2)]">
+                  <Sparkles size={11} /> Closer fit
                 </span>
               )}
             </div>
-            {answered && <p className="mt-1.5 border-t border-black/[0.06] pt-1.5 text-xs text-[var(--color-slate)]">{opt.note}</p>}
+            {answered && <p className="mt-1.5 border-t border-black/[0.06] pt-1.5 text-sm text-[var(--color-slate)]">{opt.note}</p>}
           </button>
         );
       })}

@@ -5,5 +5,5 @@ export function LabCard({ children, className = "" }: { children: ReactNode; cla
 }
 
 export function LabLabel({ children }: { children: ReactNode }) {
-  return <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-[var(--color-slate)]">{children}</p>;
+  return <p className="mb-1.5 text-xs font-bold uppercase tracking-wide text-[var(--color-slate)]">{children}</p>;
 }
